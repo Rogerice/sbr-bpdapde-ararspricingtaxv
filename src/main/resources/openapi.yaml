@@ -1,0 +1,186 @@
+
+openapi: 3.0.1
+info:
+  title: Santander F1rst Contract
+  description: 'This is a sample Santander AppArsenal server.'
+  termsOfService: http://swagger.io/terms/
+  contact:
+    email:
+    name:
+  license:
+    name: Santander F1rst
+  version: 1.0.0
+security:
+  - apparsenal_auth:
+      - write:apparsenalRole
+      - read:apparsenalRole
+tags:
+  - name: AppArsenal
+    description: AppArsenal
+paths:
+  /api/v1/apparsenal:
+    get:
+      tags:
+        - AppArsenal
+      summary: Get list of records
+      description: Get all AppArsenal
+      operationId: getAll
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AppArsenalResponseDTO'
+      security:
+        - apparsenal_auth:
+            - write:apparsenalRole
+            - read:apparsenalRole
+    
+    post:
+      tags:
+        - AppArsenal
+      summary: Create AppArsenal
+      description: Create AppArsenal functionality
+      operationId: create
+      requestBody:
+        description: Created apparsenal object
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/AppArsenalRequestDTO'
+        required: true
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppArsenalResponseDTO'
+      x-codegen-request-body-name: body
+      security:
+        - apparsenal_auth:
+            - write:apparsenalRole
+            - read:apparsenalRole
+  /api/v1/apparsenal/{id}:
+    get:
+      tags:
+        - AppArsenal
+      summary: Get AppArsenal by AppArsenal id
+      operationId: getById
+      parameters:
+        - name: id
+          in: path
+          description: 'The name that needs to be fetched. Use apparsenal1 for testing. '
+          required: true
+          schema:
+            type: long
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppArsenalResponseDTO'
+        404:
+          description: AppArsenal not found
+          content: {}
+      security:
+        - apparsenal_auth:
+            - write:apparsenalRole
+            - read:apparsenalRole
+    put:
+      tags:
+        - AppArsenal
+      summary: Updated AppArsenal
+      description: This can only be done by the logged in AppArsenal.
+      operationId: update
+      parameters:
+        - name: id
+          in: path
+          description: name that need to be updated
+          required: true
+          schema:
+            type: long
+      requestBody:
+        description: Updated AppArsenal object
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/AppArsenalRequestDTO'
+        required: true
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppArsenalResponseDTO'
+        400:
+          description: Invalid apparsenal supplied
+          content: {}
+        404:
+          description: AppArsenal not found
+          content: {}
+      x-codegen-request-body-name: body
+      security:
+        - apparsenal_auth:
+            - write:apparsenalRole
+            - read:apparsenalRole
+    delete:
+      tags:
+        - AppArsenal
+      summary: Delete AppArsenal
+      description: This can only be done by the logged in AppArsenal.
+      operationId: delete
+      parameters:
+        - name: id
+          in: path
+          description: The name that needs to be deleted
+          required: true
+          schema:
+            type: long
+      responses:
+        201:
+          description: operation successful
+          content: {}
+        400:
+          description: Invalid AppArsenalname supplied
+          content: {}
+        404:
+          description: AppArsenal not found
+          content: {}
+      security:
+        - apparsenal_auth:
+            - write:apparsenalRole
+            - read:apparsenalRole
+components:
+  schemas:
+    AppArsenalRequestDTO:
+      type: object
+      properties:
+        otherInfo:
+          type: string
+    AppArsenalResponseDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        otherInfo:
+          type: string
+  securitySchemes:
+    apparsenal_auth:
+      type: oauth2
+      flows:
+        implicit:
+          authorizationUrl: http://reflectoring.swagger.io/oauth/dialog
+          scopes:
+            write:apparsenalRole: modify apparsenal
+            read:apparsenalRole: read apparsenal
+    api_key:
+      type: apiKey
+      name: api_key
+      in: header

@@ -1,0 +1,96 @@
+
+# Spring Boot application properties
+spring:
+  main:
+    banner-mode: 'console'
+  http:
+    encoding:
+      charset: "UTF-8"
+  application:
+    name: "gln-back-arsenal-backend-archetype-base"
+    version: "3.10.0"
+    description: "Archetype for generating Arsenal applications"
+
+# Dados exibidos no endpoint "info" do Actuator
+info:
+  app:
+    groupId: "com.santander.ars"
+    artifactId: "gln-back-arsenal-backend-archetype-base"
+    version: "3.10.0"
+    java.version: "17.0.7"
+
+# server port
+server:
+  port: 8080
+  #servlet:
+    #context-path: /ars-pricing-tax-v1 
+    
+# Arsenal core library settings
+arsenal:
+  library:
+    core:
+      api:
+        enable-docs: true # Desativar documentação Swagger/OpenAPI
+        docs-base-package: com.santander.bp.controller # Package where the controller classes are located
+        archetypekey: ####415253454E414C####
+  logging:
+    console-log: true
+    dev-mode: true
+#    kafka:
+#        servers: localhost:9092
+#        topic: logs
+#        keystore:
+#            location: /tmp/keystore
+#            password: xpto
+#        truststore:
+#            location: /tmp/truststore
+#            password: xpto
+    isGluon: false # If the isGluon field is true, you must set the following parameters:
+#    company: # Santander company whose component is generating the logs.
+#    componentName: # Name of the component that generates the log.
+#    componentId: # Identifier of the component that generates the log.
+#    componentType: # The type of the Gluon component (e.g., microservice, API...)
+#    appName: # The technical application name
+#    appId: # Identifier of the application of the component that generates the log.
+
+# Sobrescrevendo grupos e níveis de log
+logging:
+  group:
+    web: org.springframework.core.codec, org.springframework.http, org.springframework.web
+    spring: org.springframework.core.env
+    servlet: org.springframework.boot.web, org.apache.catalina, org.apache.coyote, org.apache.tomcat
+    data: org.springframework.jdbc.core, org.hibernate.sql, org.springframework.orm.jpa, com.zaxxer.hikari, org.hibernate, org.jooq.tools.LoggerListener
+    app: com.santander.bp
+  level:
+    root: WARN
+    spring: INFO
+    app: INFO
+    servlet: WARN
+    web: WARN
+    data: INFO
+
+# Resilience4j settings
+resilience4j:
+  ratelimiter:
+    instances:
+      appArsenalController:
+        limitForPeriod: 100
+        limitRefreshPeriod: 1000ms
+        timeoutDuration: 2000ms
+  timelimiter:
+    instances:
+      appArsenalController:
+        timeoutDuration: 2s
+
+# Health default configurations
+management:
+  endpoint:
+    health:
+      show-details: "ALWAYS"
+      probes:
+        enabled: true
+  health:
+    livenessState:
+      enabled: true
+    readinessState:
+      enabled: true

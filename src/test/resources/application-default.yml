@@ -1,0 +1,61 @@
+# server port
+server:
+  port: 8080
+  host: http://localhost
+  #servlet:
+    #context-path: /ars-pricing-tax-v1 
+
+# Arsenal core library settings
+arsenal:
+  library:
+    core:
+      api:
+        enable-docs: true # Disable Swagger/OpenAPI documentation
+        docs-base-package: com.santander.bp.controller #Package where the controller classes are found
+        #archetypekey: ####415253454E414C####
+  logging:
+    dev-mode: true
+    isGluon: false
+
+# Database settings
+spring.jpa:
+  database: H2
+  show-sql: true
+  generate-ddl: true
+  hibernate:
+    ddl-auto: create
+  properties:
+    hibernate:
+      dialect: org.hibernate.dialect.H2Dialect
+
+spring.datasource:
+  continue-on-error: false
+    # The database connection can be made automatically if the user/password properties
+    # are set directly in the environment variables declared below.
+    #
+    # However, we recommend that you store these credentials in OpenShift Secrets.
+    #
+    # When using Secrets, environment variables now count the path to secret files.
+    #
+    # Spring Boot doesn't "know" how to open Secret files and read their contents, for this reason
+    # We use a custom DataSource (see DatabaseConfig class) that does this process.
+    #
+  # See credential settings further above in the apparsenalname.backing-services.database section.
+  platform: h2
+
+# Logging
+# Overriding log groups and levels
+logging:
+  group:
+    web: org.springframework.core.codec, org.springframework.http, org.springframework.web
+    spring: org.springframework.core.env
+    servlet: org.springframework.boot.web, org.apache.catalina, org.apache.coyote, org.apache.tomcat
+    data: org.springframework.jdbc.core, org.hibernate.sql, org.springframework.orm.jpa, com.zaxxer.hikari, org.hibernate, org.jooq.tools.LoggerListener
+    app: com.santander.bp
+  level:
+    root: WARN
+    spring: INFO
+    app: INFO
+    servlet: WARN
+    web: WARN
+    data: WARN
