@@ -1,186 +1,578 @@
-
 openapi: 3.0.1
 info:
-  title: Santander F1rst Contract
-  description: 'This is a sample Santander AppArsenal server.'
-  termsOfService: http://swagger.io/terms/
-  contact:
-    email:
-    name:
-  license:
-    name: Santander F1rst
+  title: Offer and Pricing Service
+  description: Responsible for managing fixed income investment operations, searching for offers and rates
   version: 1.0.0
+  contact:
+    email: "X311187@prservicos.com.br"
+  license:
+    name: "Apache"
+    url: https://www.apache.org/licenses/LICENSE-2.0
+servers:
+  - url: /v1/bp_offer_pricing
 security:
-  - apparsenal_auth:
-      - write:apparsenalRole
-      - read:apparsenalRole
+  - Authorization: [ ]
 tags:
-  - name: AppArsenal
-    description: AppArsenal
+  - name: Offers Fees
+    description: Self-Issued Fixed Income Investment products
 paths:
-  /api/v1/apparsenal:
+  /fees:
+    post:
+      operationId: retrievePricingAndCosmusDataByToken
+      description: Request offers and fees for fixed incomes
+      tags:
+        - Offers Fees
+      summary: Processes the provided investment data to determine applicable fees and optimize offer conditions based on customer profile and market segment.
+      requestBody:
+        description: "Data to be received for pricing request"
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Proposal'  
+        required: true
+      responses:
+        '200':
+          $ref: '#/components/responses/GetFeeOk'     
+        '204':
+          $ref: "#/components/responses/NoContent"
+        '400':
+          $ref: "#/components/responses/BadRequest"  
+        '401':
+          $ref: "#/components/responses/Unauthorized"
+        '403':
+          $ref: "#/components/responses/Forbidden"
+        '404':
+          $ref: "#/components/responses/NotFound"
+        '500':
+          $ref: "#/components/responses/InternalServerError"
+        '503':
+          $ref: "#/components/responses/ServiceUnavailable"
+        '504':
+          $ref: "#/components/responses/GatewayTimeout"
+  /offers:
     get:
       tags:
-        - AppArsenal
-      summary: Get list of records
-      description: Get all AppArsenal
-      operationId: getAll
+        - Aggregated Data
+      summary: "Fetches offers and the associated fees, returning combined data under the primary entity of 'Offers'."
+      operationId: retrieveAggregatedData
+      parameters:
+        - $ref: "#/components/parameters/X-Santander-Client-Id"
+        - $ref: '#/components/parameters/_limit'
+        - $ref: '#/components/parameters/_offset'
+        - $ref: "#/components/parameters/Document-Type"
+        - $ref: "#/components/parameters/CustomerId"
+        - $ref: "#/components/parameters/DocumentNumber"
+        - $ref: "#/components/parameters/Segment"
+        - $ref: "#/components/parameters/Channel"
+        - $ref: "#/components/parameters/CenterId"
       responses:
-        200:
-          description: successful operation
-          content:
-            application/json:
-              schema:
+        '200':
+          description: "OK"
+          $ref: '#/components/responses/GetAggregateOk'
+        '204':
+          $ref: "#/components/responses/NoContent"
+        '400':
+          $ref: "#/components/responses/BadRequest"  
+        '401':
+          $ref: "#/components/responses/Unauthorized"
+        '403':
+          $ref: "#/components/responses/Forbidden"
+        '404':
+          $ref: "#/components/responses/NotFound"
+        '500':
+          $ref: "#/components/responses/InternalServerError"
+        '503':
+          $ref: "#/components/responses/ServiceUnavailable"
+        '504':
+          $ref: "#/components/responses/GatewayTimeout"
+components:
+  parameters:
+    X-Santander-Client-Id:
+      name: "x-santander-client-id"
+      schema:
+        type: "string"
+      required: true
+      in: "header"
+      description: "Client ID header"
+      example: "a1b30a84-7bf3-442e-84a0-e935d8163b5a"
+    _limit:
+      in: query
+      name: _limit
+      description: _limit value
+      schema:
+        type: integer
+        format: int32
+    _offset:
+      in: query
+      name: _offset
+      description: _offset value
+      schema:
+        type: integer
+        format: int32
+    Document-Type:
+      in: query
+      name: document_type
+      description: Tipo documento
+      required: true
+      schema:
+        type: string
+    CustomerId:
+      in: query
+      name: customer_id
+      description: Penumper do client
+      required: true
+      schema:
+        type: string
+    DocumentNumber:
+      in: query
+      name: document_number
+      description: numero do documento
+      required: true
+      schema:
+        type: string
+    Segment:
+      in: query
+      name: segment
+      description: segmento do canal
+      required: true
+      schema:
+        type: string
+    Channel:
+      in: query
+      name: channel
+      description: canal da requisição
+      required: true
+      schema:
+        type: string
+    CenterId:
+      in: query
+      name: center_id
+      description: Agencia
+      required: true
+      schema:
+        type: string
+  schemas:
+    Proposal:                 
+      type: object
+      description: "Data structure containing information about a proposal"
+      properties:
+        proposalId :
+          type : "string"
+          description : "Unique proposal ID"
+          example : "PDA102030"
+        center:
+          type: string
+          description: "Center ID"
+          example: "0025"
+          x-santander-security-cdo-level: confidential
+          x-santander-security-encrypt-type: normal  
+        #BEGIN NEW FIELDS
+        channel:
+          type: string
+          description: "Channel through which the operation was requested"
+          example: "77"
+          x-santander-security-cdo-level: confidential
+          x-santander-security-encrypt-type: normal
+        company:
+          type: string
+          description: "Name of the associated company"
+          example: "Nome da empresa"
+          x-santander-security-cdo-level: confidential
+          x-santander-security-encrypt-type: normal
+        personId:
+          type : "string"
+          description : "Unique person ID"
+          example : "F123456789"
+          x-santander-security-cdo-level: confidential
+          x-santander-security-encrypt-type: normal
+        documentNumber:
+          type: string
+          description: "Document number"
+          example: "34034505445" 
+          x-santander-security-cdo-level: confidential
+          x-santander-security-encrypt-type: normal
+        documentType:
+          type: string
+          description: "Document type"
+          example: "CPF"
+          x-santander-security-cdo-level: confidential
+          x-santander-security-encrypt-type: normal
+        couponCampaign:
+          type: string
+          description: "Campaign or coupon code"
+          example: "Codigo de cupom campanha"
+          x-santander-security-cdo-level: confidential
+          x-santander-security-encrypt-type: normal
+        system:
+          type: string
+          description: "Name of the requesting system"
+          example: "PDI"
+          x-santander-security-cdo-level: confidential
+          x-santander-security-encrypt-type: normal
+        pricingType:
+          type: string
+          description: "Pricing type: R1 or R2"
+          example: "R1"
+          x-santander-security-cdo-level: confidential
+          x-santander-security-encrypt-type: normal
+        segment:
+          type: string
+          description: "Client's market segment"
+          example: "Select"
+          x-santander-security-cdo-level: internal
+          x-santander-security-encrypt-type: normal
+        currency:
+          type: string
+          description: "Operation currency"
+          example: "BRL"
+          x-santander-security-cdo-level: internal
+          x-santander-security-encrypt-type: normal
+        appliedValue:
+          type: number
+          description: "Value applied in the operation"
+          example: 1000.00
+          x-santander-security-cdo-level: internal
+          x-santander-security-encrypt-type: normal
+        proposals:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: number
+                description: "Unique ID for each proposal"
+                example: 12345
+                x-santander-security-cdo-level: confidential
+                x-santander-security-encrypt-type: normal
+              productFamily:
+                type: string
+                description: "Product family name (e.g., CDB)"
+                example: "CDB"
+                x-santander-security-cdo-level: confidential
+                x-santander-security-encrypt-type: normal
+              indexType:
+                type: string
+                description: "Index type (e.g., CDI)"
+                example: "CDI"
+                x-santander-security-cdo-level: confidential
+                x-santander-security-encrypt-type: normal
+              subProduct:
+                type: string
+                description: "Subproduct code (e.g., 0013)"
+                example: "0013"
+                x-santander-security-cdo-level: confidential
+                x-santander-security-encrypt-type: normal
+              totalTerm:
+                type: number
+                description: "Total term of the contract"
+                example: 30
+                x-santander-security-cdo-level: confidential
+                x-santander-security-encrypt-type: normal
+              progressiveTerms:
                 type: array
                 items:
-                  $ref: '#/components/schemas/AppArsenalResponseDTO'
-      security:
-        - apparsenal_auth:
-            - write:apparsenalRole
-            - read:apparsenalRole
+                  type: number
+                  description: "List of progressive terms (e.g., 30, 60, 90 days)"
+                  example: 30
+                x-santander-security-cdo-level: confidential
+                x-santander-security-encrypt-type: normal
+              gracePeriod:
+                type: number
+                description: "Minimum grace period for the investment"
+                example: 180
+                x-santander-security-cdo-level: confidential
+                x-santander-security-encrypt-type: normal
+                #END NEW FIELDS
     
-    post:
-      tags:
-        - AppArsenal
-      summary: Create AppArsenal
-      description: Create AppArsenal functionality
-      operationId: create
-      requestBody:
-        description: Created apparsenal object
-        content:
-          '*/*':
-            schema:
-              $ref: '#/components/schemas/AppArsenalRequestDTO'
-        required: true
-      responses:
-        200:
-          description: successful operation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/AppArsenalResponseDTO'
-      x-codegen-request-body-name: body
-      security:
-        - apparsenal_auth:
-            - write:apparsenalRole
-            - read:apparsenalRole
-  /api/v1/apparsenal/{id}:
-    get:
-      tags:
-        - AppArsenal
-      summary: Get AppArsenal by AppArsenal id
-      operationId: getById
-      parameters:
-        - name: id
-          in: path
-          description: 'The name that needs to be fetched. Use apparsenal1 for testing. '
-          required: true
-          schema:
-            type: long
-      responses:
-        200:
-          description: successful operation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/AppArsenalResponseDTO'
-        404:
-          description: AppArsenal not found
-          content: {}
-      security:
-        - apparsenal_auth:
-            - write:apparsenalRole
-            - read:apparsenalRole
-    put:
-      tags:
-        - AppArsenal
-      summary: Updated AppArsenal
-      description: This can only be done by the logged in AppArsenal.
-      operationId: update
-      parameters:
-        - name: id
-          in: path
-          description: name that need to be updated
-          required: true
-          schema:
-            type: long
-      requestBody:
-        description: Updated AppArsenal object
-        content:
-          '*/*':
-            schema:
-              $ref: '#/components/schemas/AppArsenalRequestDTO'
-        required: true
-      responses:
-        200:
-          description: successful operation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/AppArsenalResponseDTO'
-        400:
-          description: Invalid apparsenal supplied
-          content: {}
-        404:
-          description: AppArsenal not found
-          content: {}
-      x-codegen-request-body-name: body
-      security:
-        - apparsenal_auth:
-            - write:apparsenalRole
-            - read:apparsenalRole
-    delete:
-      tags:
-        - AppArsenal
-      summary: Delete AppArsenal
-      description: This can only be done by the logged in AppArsenal.
-      operationId: delete
-      parameters:
-        - name: id
-          in: path
-          description: The name that needs to be deleted
-          required: true
-          schema:
-            type: long
-      responses:
-        201:
-          description: operation successful
-          content: {}
-        400:
-          description: Invalid AppArsenalname supplied
-          content: {}
-        404:
-          description: AppArsenal not found
-          content: {}
-      security:
-        - apparsenal_auth:
-            - write:apparsenalRole
-            - read:apparsenalRole
-components:
-  schemas:
-    AppArsenalRequestDTO:
+    #MODIFY OBJECT 
+    PriceProposal:        
+      type: object
+      description: "Data structure containing information about a price proposal. A price proposal is the process by which a product's final interest rate(s) is (are) calculated after the defined list prices and other relevant amounts, such as subsidies or funding costs, have been applied."
+      properties:
+        priceProposalId:  
+          type: string
+          description: "Unique price proposal ID"
+          example: "123654"
+          x-santander-security-cdo-level: internal
+          x-santander-security-encrypt-type: normal
+        #BEGIN NEW FIELDS  
+        applicationFees:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: number
+                description: "Unique ID for each proposal"
+                example: 12345
+                x-santander-security-cdo-level: internal
+                x-santander-security-encrypt-type: normal
+              sequenceNumber:
+                type: string
+                description: "Unique sequence code for each proposal generated by pricing"
+                example: "435675"
+                x-santander-security-cdo-level: internal
+                x-santander-security-encrypt-type: normal
+              product:
+                type: string
+                description: "Name of the product (e.g., CDB)"
+                example: "CDB"
+                x-santander-security-cdo-level: confidential
+                x-santander-security-encrypt-type: normal
+              indexType:
+                type: string
+                description: "Type of indexer (e.g., CDI)"
+                example: "CDI"
+                x-santander-security-cdo-level: confidential
+                x-santander-security-encrypt-type: normal
+              subProduct:
+                type: string
+                description: "Subproduct code (e.g., 0019)"
+                example: "0019"
+                x-santander-security-cdo-level: confidential
+                x-santander-security-encrypt-type: normal
+              rateTerms:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    rate:
+                      type: number
+                      description: "Rate applied for the given term"
+                      example: 20
+                      x-santander-security-cdo-level: internal
+                      x-santander-security-encrypt-type: normal
+                    term:
+                      type: number
+                      description: "Term in days for the rate"
+                      example: 180
+                      x-santander-security-cdo-level: internal
+                      x-santander-security-encrypt-type: normal
+              funding:
+                type: number
+                description: "Funding value"
+                example: 1000.00
+                x-santander-security-cdo-level: confidential
+                x-santander-security-encrypt-type: normal
+              reason:
+                type: string
+                description: "Reason for the calculated rate"
+                example: "Client's profile"
+                x-santander-security-cdo-level: internal
+                x-santander-security-encrypt-type: normal
+              campaign:
+                type: string
+                description: "Campaign associated with the proposal"
+                example: "djerifg"
+                x-santander-security-cdo-level: internal
+                x-santander-security-encrypt-type: normal
+    FixedIncomeAggregatedOffersAndFees: 
       type: object
       properties:
-        otherInfo:
-          type: string
-    AppArsenalResponseDTO:
+        offers:
+          type: array
+          items:
+            $ref: '#/components/schemas/Product'
+        fees:
+          type: array
+          items:
+            $ref: '#/components/schemas/PriceProposal'
+      required:
+        - offers
+        - fees
+    Product: 
       type: object
       properties:
-        id:
-          type: integer
-          format: int64
-        otherInfo:
+        product:
           type: string
+          description: "Product name"
+          example: "CDB"
+          x-santander-security-cdo-level: internal  
+          x-santander-security-encrypt-type: normal 
+        productDescription:
+          type: string
+          description: "Description of the product"
+          example: "Bank Deposit Certificate"
+          x-santander-security-cdo-level: internal
+          x-santander-security-encrypt-type: normal
+        familyCode:
+          type: string
+          description: "Family code of the product"
+          example: "77"
+          x-santander-security-cdo-level: internal
+          x-santander-security-encrypt-type: normal
+        subProducts:
+          type: array
+          items:
+            $ref: '#/components/schemas/SubProduct' 
+    
+    # MODIFY OBJECT        
+    SubProduct:
+      type: object
+      properties:
+        name:
+          type: string
+          description: "Subproduct name"
+          example: "CDB DI"
+          x-santander-security-cdo-level: internal
+          x-santander-security-encrypt-type: normal
+        #BEGIN NEW FIELDS  
+        minimumApplicationValue:
+          type: number
+          format: float
+          description: "Minimum application value"
+          example: 1000.00
+          x-santander-security-cdo-level: internal
+          x-santander-security-encrypt-type: normal
+        minimumRedeemValue:
+          type: number
+          format: float
+          description: "Minimum redeem value"
+          example: 1000.00
+          x-santander-security-cdo-level: internal
+          x-santander-security-encrypt-type: normal
+        minimumBalanceValue:
+          type: number
+          format: float
+          description: "Minimum balance value"
+          example: 1000.00
+          x-santander-security-cdo-level: internal
+          x-santander-security-encrypt-type: normal
+        progressiveRemunerationIndicator:
+          type: string
+          description: "Indicator if progressive remuneration is applied"
+          example: "Y"
+          x-santander-security-cdo-level: internal
+          x-santander-security-encrypt-type: normal
+        indexerDescription:
+          type: string
+          description: "Description of the indexer"
+          example: "CDI - Bank Deposit Certificate"
+          x-santander-security-cdo-level: internal
+          x-santander-security-encrypt-type: normal
+        subCode:
+          type: string
+          description: "Subproduct Code"
+          example: "0013"
+          x-santander-security-cdo-level: internal
+          x-santander-security-encrypt-type: normal
+        remunerationTerms:
+          type: array
+          items:
+            type: object
+            properties:
+              initRemTerm:
+                type: integer
+                description: "Initial remuneration term"
+                example: 30
+                x-santander-security-cdo-level: internal
+                x-santander-security-encrypt-type: normal
+              finalRemTerm:
+                type: integer
+                description: "Final remuneration term"
+                example: 60
+                x-santander-security-cdo-level: internal
+                x-santander-security-encrypt-type: normal
+        graceIndicator:
+          type: string
+          description: "Grace Period Indicator"
+          example: "90"
+          x-santander-security-cdo-level: internal
+          x-santander-security-encrypt-type: normal
+          #END NEW FIELDS
+
+    Errors:
+      type: "object"
+      description: "Data structure containing the details for errors"
+      properties:
+        errors:
+          description: "Array of errors"
+          type: "array"
+          items:
+            $ref: "#/components/schemas/Error"
+    Error:
+      type: "object"
+      description: "Data structure containing the error details"
+      properties:
+        code:
+          type: "string"
+          description: "Unique alphanumeric human readable error code"
+          example: "ERR001"
+        message:
+          type: "string"
+          description: "Brief summary of the reported issue"
+          example: "Invalid Action"
+        level:
+          type: "string"
+          description: "Level of the reported issue"
+          enum:
+            - info
+            - warning
+            - error
+          example: "error"
+        description:
+          type: "string"
+          description: "Detailed description of the reported issue"
+          example: "Description"
+  responses:
+    GetFeeOk:
+      description: "OK"
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/PriceProposal'
+    GetAggregateOk:
+      description: "OK"
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/FixedIncomeAggregatedOffersAndFees'
+    NoContent:
+      description: "No content"
+    Unauthorized:
+      description: "Unauthorized"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Errors"
+    Forbidden:
+      description: "Forbidden"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Errors"
+    BadRequest:
+      description: "Bad Request"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Errors"        
+    NotFound:
+      description: "Not Found"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Errors"
+    InternalServerError:
+      description: "Server Error"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Errors"
+    ServiceUnavailable:
+      description: "Server Error"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Errors"
+    GatewayTimeout:
+      description: "Gateway timeout"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Errors"
   securitySchemes:
-    apparsenal_auth:
-      type: oauth2
-      flows:
-        implicit:
-          authorizationUrl: http://reflectoring.swagger.io/oauth/dialog
-          scopes:
-            write:apparsenalRole: modify apparsenal
-            read:apparsenalRole: read apparsenal
-    api_key:
-      type: apiKey
-      name: api_key
-      in: header
+    Authorization:
+      type: "http"
+      scheme: "bearer"
+      bearerFormat: "JWT"

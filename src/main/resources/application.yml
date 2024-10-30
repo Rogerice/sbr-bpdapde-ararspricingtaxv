@@ -1,11 +1,7 @@
-
 # Spring Boot application properties
 spring:
   main:
     banner-mode: 'console'
-  http:
-    encoding:
-      charset: "UTF-8"
   application:
     name: "gln-back-arsenal-backend-archetype-base"
     version: "3.10.0"
@@ -22,16 +18,37 @@ info:
 # server port
 server:
   port: 8080
-  #servlet:
-    #context-path: /ars-pricing-tax-v1 
-    
+  servlet:
+    encoding:
+      charset: UTF-8
+  #context-path: /ars-pricing-tax-v1
+   
 # Arsenal core library settings
 arsenal:
   library:
+    altair:
+      personado: false
+      altair-user: ${ALTAIR_MQ_USER}
+      altair-config:
+      format-classpath: com.santander.bp.model.altair
+      message-format: PS7
+      psFormatEnum: PS7
+      useHeaderPs: false
+      channel: ${ALTAIR_MQ_CHANNEL}
+      message-expired-timeout: 60000
+      receive-timeout: 60000
+      request-queue: ${ALTAIR_MQ_QUEUE_REQUEST_NAME}
+      response-queue: ${ALTAIR_MQ_QUEUE_RESPONSE_NAME}
+      server:
+        hostname: ${ALTAIR_MQ_QUEUE_SERVER_HOSTNAME}
+        port: ${ALTAIR_MQ_QUEUE_SERVER_PORT}
+        channel: ${ALTAIR_MQ_CHANNEL}
+        username: username
+        pwd: password
     core:
       api:
         enable-docs: true # Desativar documentação Swagger/OpenAPI
-        docs-base-package: com.santander.bp.controller # Package where the controller classes are located
+        docs-base-package: com.santander.gt.ngt.controller # Package where the controller classes are located
         archetypekey: ####415253454E414C####
   logging:
     console-log: true

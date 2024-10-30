@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
@@ -64,8 +64,14 @@
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-web</artifactId>
 		</dependency>
-	</dependencies>
 
+		<!--Altair - Transação-->
+		<dependency>
+			<groupId>br.com.santander.ars</groupId>
+			<artifactId>arsenal-lib-altair</artifactId>
+			<version>2.0.0</version>
+		</dependency>
+	</dependencies>
 	<build>
 		<plugins>
 			<plugin>
@@ -78,12 +84,14 @@
 						</goals>
 						<configuration>
 							<skipValidateSpec>true</skipValidateSpec>
-							<inputSpec>${project.basedir}/src/main/resources/openapi.yaml</inputSpec>
+							<inputSpec>
+								${project.basedir}/src/main/resources/openapi.yaml</inputSpec>
 							<generatorName>spring</generatorName>
 							<apiPackage>com.santander.bp.api</apiPackage>
 							<modelPackage>com.santander.bp.model</modelPackage>
 							<supportingFilesToGenerate>ApiUtil.java</supportingFilesToGenerate>
-							<templateDirectory>${project.basedir}/src/main/resources</templateDirectory>
+							<templateDirectory>
+								${project.basedir}/src/main/resources</templateDirectory>
 							<configOptions>
 								<useSpringBoot3>true</useSpringBoot3>
 								<delegatePattern>true</delegatePattern>
@@ -97,8 +105,11 @@
 								<useSwaggerAnnotations>false</useSwaggerAnnotations>
 								<async>true</async>
 								<returnResponse>true</returnResponse>
-								<additionalModelTypeAnnotations>@SuppressWarnings({"hiding", "static-method", "unused"})</additionalModelTypeAnnotations>
-								<additionalModelTypeAnnotations>@lombok.Builder @lombok.NoArgsConstructor @lombok.AllArgsConstructor</additionalModelTypeAnnotations>
+								<additionalModelTypeAnnotations>@SuppressWarnings({"hiding",
+									"static-method", "unused"})</additionalModelTypeAnnotations>
+								<additionalModelTypeAnnotations>@lombok.Builder
+									@lombok.NoArgsConstructor
+									@lombok.AllArgsConstructor</additionalModelTypeAnnotations>
 							</configOptions>
 						</configuration>
 					</execution>
@@ -184,6 +195,7 @@
 							<groupId>org.projectlombok</groupId>
 							<artifactId>lombok</artifactId>
 							<version>${lombok.version}</version>
+							<scope>provided</scope>
 						</path>
 						<path>
 							<groupId>org.mapstruct</groupId>
