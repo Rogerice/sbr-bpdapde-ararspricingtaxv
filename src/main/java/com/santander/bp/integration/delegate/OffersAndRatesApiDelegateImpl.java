@@ -1,8 +1,10 @@
 package com.santander.bp.integration.delegate;
 
 import com.santander.bp.api.OffersAndRatesApiDelegate;
+import com.santander.bp.exception.AltairException;
+import com.santander.bp.exception.CosmosDbException;
 import com.santander.bp.exception.RestApiException;
-import com.santander.bp.model.Error; // Importa a classe Error correta do seu pacote
+import com.santander.bp.model.Error;
 import com.santander.bp.model.Error.LevelEnum;
 import com.santander.bp.model.Errors;
 import com.santander.bp.model.OffersPricingRequest;
@@ -43,7 +45,10 @@ public class OffersAndRatesApiDelegateImpl implements OffersAndRatesApiDelegate 
                 offersPricingRequest.getSegment(), offersPricingRequest.getChannel(), "26");
 
         if (cosmosOffers.isEmpty()) {
-          //  throw new RestApiException(AppError.NOT_LIST_ERROR);
+          throw new CosmosDbException(
+              "NOT_LIST_ERROR",
+              "No offers found",
+              "No offers were found with the specified criteria in CosmosDB");
         }
 
         future.complete(ResponseEntity.ok(cosmosOffers));
@@ -52,46 +57,47 @@ public class OffersAndRatesApiDelegateImpl implements OffersAndRatesApiDelegate 
             offersPricingServiceBP82.processOffers(offersPricingRequest);
         future.complete(ResponseEntity.ok(response));
       }
-
-    } catch (RestApiException e) {
-      Errors errorResponse =
-          Errors.builder()
-              .errors(
-                  List.of(
-                      Error.builder()
-                          .code(String.valueOf(e.getCode()))
-                          .message(e.getMessage())
-                          .level(LevelEnum.ERROR)
-                          .description("\"TESTE DE ERRO COMOSOS\", \"LIST ERRO COSMOS")
-                          .build()))
-              .build();
-
-      OffersPricingResponse errorPricingResponse =
-          OffersPricingResponse.builder().errors(errorResponse.getErrors()).build();
-
-      ResponseEntity<List<OffersPricingResponse>> responseEntity =
-          ResponseEntity.status(e.getHttpStatus()).body(List.of(errorPricingResponse));
-
-      future.complete(responseEntity);
-
     } catch (Exception e) {
-      Errors errorResponse =
-          Errors.builder()
-              .errors(
-                  List.of(
-                      Error.builder()
-                          .code("500")
-                          .message("Internal Server Error")
-                          .level(LevelEnum.ERROR)
-                          .description(e.getMessage())
-                          .build()))
-              .build();
+      Errors errorResponse;
+      if (e instanceof CosmosDbException || e instanceof AltairException) {
+        int code = ((RestApiException) e).getCode();
+        String message = e.getMessage();
+        String description = ((AltairException) e).getDescription();
+
+        errorResponse =
+            Errors.builder()
+                .errors(
+                    List.of(
+                        Error.builder()
+                            // .code(code)
+                            .message(message)
+                            .level(LevelEnum.ERROR)
+                            .description(description)
+                            .build()))
+                .build();
+      } else {
+        // Tratamento de erro genérico
+        errorResponse =
+            Errors.builder()
+                .errors(
+                    List.of(
+                        Error.builder()
+                            .code("500")
+                            .message("Internal Server Errowrdfdsdsfr")
+                            .level(LevelEnum.ERROR)
+                            .description(e.getMessage())
+                            .build()))
+                .build();
+      }
 
       OffersPricingResponse errorPricingResponse =
           OffersPricingResponse.builder().errors(errorResponse.getErrors()).build();
 
       ResponseEntity<List<OffersPricingResponse>> responseEntity =
-          ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+          ResponseEntity.status(
+                  e instanceof RestApiException
+                      ? ((RestApiException) e).getHttpStatus()
+                      : HttpStatus.INTERNAL_SERVER_ERROR)
               .body(List.of(errorPricingResponse));
 
       future.complete(responseEntity);

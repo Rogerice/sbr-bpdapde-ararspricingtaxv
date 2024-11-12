@@ -7,8 +7,8 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 
 /** Main class for the AppArsenal application. */
 @EnableFeignClients
-@SpringBootApplication
 @EnableArsenalAltair
+@SpringBootApplication(scanBasePackages = {"com.santander.bp", "com.santander.bp.exception"})
 public class ArsenalApplication {
 
   /**
