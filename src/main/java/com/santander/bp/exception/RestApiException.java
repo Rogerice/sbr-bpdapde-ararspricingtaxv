@@ -1,28 +1,42 @@
 package com.santander.bp.exception;
 
-import lombok.Getter;
+import org.springframework.http.HttpStatus;
 
-@Getter
 public class RestApiException extends RuntimeException {
+  private static final long serialVersionUID = 1L;
 
-  private final AppError error;
-
+  private final HttpStatus httpStatus;
+  private final int code;
+  private final String title;
   private final String message;
+  private final Object details;
 
-  public RestApiException(AppError error) {
-    this.error = error;
-    this.message = null;
+  public RestApiException(AppError appError) {
+    super(appError.getMessage());
+    this.httpStatus = appError.getHttpStatus();
+    this.code = appError.getCode();
+    this.title = appError.getTitle();
+    this.message = appError.getMessage();
+    this.details = appError.getDetails();
   }
 
-  public RestApiException(AppError error, Exception e) {
-    super(e);
-    this.error = error;
-    this.message = e.getMessage();
+  public HttpStatus getHttpStatus() {
+    return httpStatus;
   }
 
-  public RestApiException(Exception e) {
-    super(e);
-    this.error = AppError.CANNOT_GET_MF;
-    this.message = e.getMessage();
+  public int getCode() {
+    return code;
+  }
+
+  public String getTitle() {
+    return title;
+  }
+
+  public String getMessage() {
+    return message;
+  }
+
+  public Object getDetails() {
+    return details;
   }
 }

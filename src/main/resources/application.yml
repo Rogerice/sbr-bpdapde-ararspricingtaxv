@@ -6,6 +6,8 @@ spring:
     name: "gln-back-arsenal-backend-archetype-base"
     version: "3.10.0"
     description: "Archetype for generating Arsenal applications"
+  jackson:
+    default-property-inclusion: NON_NULL  # Adicione esta linha para uso de NOTNULL em Json
 
 # Dados exibidos no endpoint "info" do Actuator
 info:
@@ -22,7 +24,13 @@ server:
     encoding:
       charset: UTF-8
   #context-path: /ars-pricing-tax-v1
-   
+azure:
+  cosmos:
+    uri: ${DATABASE_URL}
+    key: ${DATABASE_KEY}
+    database: ${DATABASE_NAME}
+    connectionType: ${CONNECTION_TYPE}
+    queryMetricsEnabled: false      
 # Arsenal core library settings
 arsenal:
   library:

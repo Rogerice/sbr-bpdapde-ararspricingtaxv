@@ -4,12 +4,12 @@ import br.com.santander.ars.altair.config.ArsenalAltairConfig;
 import br.com.santander.ars.altair.core.facade.AltairFacade;
 import br.com.santander.ars.altair.core.facade.AltairStrategy;
 import com.altec.bsbr.fw.altair.dto.ResponseDto;
-import com.santander.bp.app.mapper.OffersMapper;
+import com.santander.bp.app.mapper.OffersMapperBP82;
 import com.santander.bp.exception.AppError;
 import com.santander.bp.exception.RestApiException;
 import com.santander.bp.factory.Transaction;
-import com.santander.bp.model.OffersAltairRequest;
-import com.santander.bp.model.OffersAltairResponse;
+import com.santander.bp.model.OffersPricingRequest;
+import com.santander.bp.model.OffersPricingResponse;
 import com.santander.bp.model.altair.BPMP82;
 import java.time.Duration;
 import java.time.Instant;
@@ -20,9 +20,9 @@ import org.springframework.stereotype.Service;
 
 @Service
 @Slf4j
-public class OffersService {
+public class OffersPricingServiceBP82 {
 
-  @Autowired private OffersMapper offersMapper;
+  @Autowired private OffersMapperBP82 offersMapperBP82;
 
   @Autowired private ArsenalAltairConfig arsenalAltairConfig;
 
@@ -30,10 +30,10 @@ public class OffersService {
 
   @Autowired private AltairFacade altairFacade;
 
-  public List<OffersAltairResponse> processOffers(OffersAltairRequest offersAltairRequest)
-      throws Exception {
-    BPMP82 bpmp82 = offersMapper.mapOffersRequest(offersAltairRequest);
+  public List<OffersPricingResponse> processOffers(OffersPricingRequest offersPricingRequest)
+      throws RestApiException {
 
+    BPMP82 bpmp82 = offersMapperBP82.mapOffersRequest(offersPricingRequest);
     ResponseDto altairReturn = sendMessageAltair(Transaction.BP82, bpmp82);
 
     if (altairReturn.getObjeto().getListaMensagem() != null
@@ -44,13 +44,13 @@ public class OffersService {
       if (!"BPA0000".equals(codigoErro)) {
         log.error(
             "Erro retornado pelo Altair MQ. Código: {}, Mensagem: {}", codigoErro, mensagemErro);
-        throw new RestApiException(AppError.ALTAR_ERROR);
+        throw new RestApiException(AppError.ALTAIR_ERROR);
       } else {
         log.info("Consulta realizada com sucesso: {}", mensagemErro);
       }
     }
 
-    return offersMapper.mapOffersResponseList(altairReturn);
+    return offersMapperBP82.mapOffersResponseList(altairReturn);
   }
 
   private ResponseDto sendMessageAltair(Transaction transaction, Object dados) {
@@ -59,12 +59,7 @@ public class OffersService {
           "Iniciando envio para Altair MQ. Transação: {}, Dados: {}", transaction.name(), dados);
 
       arsenalAltairConfig.setTransactionName(transaction.name());
-
-      log.info("Configuração do Altair realizada: {}", arsenalAltairConfig);
-
       altairFacade = altairStrategy.getAltairFacade(arsenalAltairConfig, dados);
-
-      log.info("Iniciando comunicação com Altair MQ...");
 
       Instant startingPoint = Instant.now();
       ResponseDto saida = altairFacade.executeIntegrationAltair();
@@ -80,7 +75,7 @@ public class OffersService {
           dados,
           e.getMessage(),
           e);
-      throw new RestApiException(AppError.CANNOT_SEND_MENSSAGE, e);
+      throw new RestApiException(AppError.ALTAIR_ERROR);
     }
   }
 }
