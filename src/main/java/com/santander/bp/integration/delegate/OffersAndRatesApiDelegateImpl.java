@@ -35,37 +35,9 @@ public class OffersAndRatesApiDelegateImpl implements OffersAndRatesApiDelegate 
     CompletableFuture<ResponseEntity<ResponseWrapper>> future = new CompletableFuture<>();
 
     try {
-      String documentNumber = offersPricingRequest.getDocumentNumber();
-      String centerId = offersPricingRequest.getCenterId();
-
-      if (whitelistService.isInWhitelist(documentNumber, centerId)) {
-        // Processamento para clientes da whitelist: ofertas do CosmosDB
-        try {
-          List<OffersPricingResponse> cosmosOffers =
-              cosmosDbService.getOffers(
-                  offersPricingRequest.getSegment(), offersPricingRequest.getChannel(), "26");
-
-          if (cosmosOffers.isEmpty()) {
-            // Nenhuma oferta encontrada
-            Errors errorResponse =
-                ErrorBuilderUtil.buildNotFoundError(
-                    "No offers were found with the specified criteria in CosmosDB");
-            future.complete(
-                ResponseBuilderUtil.buildErrorResponse(errorResponse, HttpStatus.NOT_FOUND));
-          } else {
-            // Sucesso: Retornar as ofertas encontradas
-            future.complete(ResponseBuilderUtil.buildSuccessResponse(cosmosOffers));
-          }
-        } catch (RestApiException e) {
-          // Capturando o erro específico do CosmosDbService
-          Errors errorResponse =
-              ErrorBuilderUtil.buildError(
-                  e.getCode(), e.getMessage(), e.getTitle(), LevelEnum.ERROR);
-          future.complete(
-              ResponseBuilderUtil.buildErrorResponse(errorResponse, HttpStatus.NOT_FOUND));
-        }
+      if (isWhitelistClient(offersPricingRequest)) {
+        processWhitelistOffers(offersPricingRequest, future);
       } else {
-        // Processamento para clientes fora da whitelist
         handleNonWhitelistCase(offersPricingRequest, future);
       }
     } catch (RestApiException e) {
@@ -81,10 +53,33 @@ public class OffersAndRatesApiDelegateImpl implements OffersAndRatesApiDelegate 
     return future;
   }
 
+  private void processWhitelistOffers(
+      OffersPricingRequest offersPricingRequest,
+      CompletableFuture<ResponseEntity<ResponseWrapper>> future) {
+    try {
+      List<OffersPricingResponse> cosmosOffers =
+          cosmosDbService.getOffers(
+              offersPricingRequest.getSegment(), offersPricingRequest.getChannel(), "26");
+
+      if (cosmosOffers.isEmpty()) {
+        Errors errorResponse =
+            ErrorBuilderUtil.buildNotFoundError(
+                "No offers were found with the specified criteria in CosmosDB");
+        future.complete(
+            ResponseBuilderUtil.buildErrorResponse(errorResponse, HttpStatus.NOT_FOUND));
+      } else {
+        future.complete(ResponseBuilderUtil.buildSuccessResponse(cosmosOffers));
+      }
+    } catch (RestApiException e) {
+      Errors errorResponse =
+          ErrorBuilderUtil.buildError(e.getCode(), e.getMessage(), e.getTitle(), LevelEnum.ERROR);
+      future.complete(ResponseBuilderUtil.buildErrorResponse(errorResponse, HttpStatus.NOT_FOUND));
+    }
+  }
+
   private void handleNonWhitelistCase(
       OffersPricingRequest offersPricingRequest,
       CompletableFuture<ResponseEntity<ResponseWrapper>> future) {
-
     try {
       List<OffersPricingResponse> response =
           offersPricingServiceBP82.processOffers(offersPricingRequest);
@@ -102,7 +97,6 @@ public class OffersAndRatesApiDelegateImpl implements OffersAndRatesApiDelegate 
         future.complete(ResponseBuilderUtil.buildSuccessResponse(response));
       }
     } catch (RestApiException e) {
-      // Capturando RestApiException do processo não-whitelist
       Errors errorResponse =
           ErrorBuilderUtil.buildError(e.getCode(), e.getMessage(), e.getTitle(), LevelEnum.ERROR);
       future.complete(
@@ -112,5 +106,17 @@ public class OffersAndRatesApiDelegateImpl implements OffersAndRatesApiDelegate 
       future.complete(
           ResponseBuilderUtil.buildErrorResponse(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR));
     }
+  }
+
+  private boolean isWhitelistClient(OffersPricingRequest offersPricingRequest) {
+    String documentType = offersPricingRequest.getDocumentType();
+    String documentNumber = offersPricingRequest.getDocumentNumber();
+    String centerId = offersPricingRequest.getCenterId();
+
+    if (whitelistService.isInWhitelist(documentType, documentNumber)) {
+      return true;
+    }
+
+    return whitelistService.isAgencyInWhitelist(centerId);
   }
 }

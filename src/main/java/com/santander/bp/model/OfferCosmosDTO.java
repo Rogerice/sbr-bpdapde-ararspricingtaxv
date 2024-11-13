@@ -16,7 +16,7 @@ import org.springframework.data.annotation.Id;
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Container(containerName = "simplificacao-bp", autoCreateContainer = false)
-public class OfferCosmos {
+public class OfferCosmosDTO {
 
   @Id
   @JsonProperty("id")
@@ -41,5 +41,5 @@ public class OfferCosmos {
   private String tpSegm;
 
   @JsonProperty("sub_products")
-  private List<SubProductCosmos> subProducts;
+  private List<SubProductCosmosDTO> subProducts;
 }

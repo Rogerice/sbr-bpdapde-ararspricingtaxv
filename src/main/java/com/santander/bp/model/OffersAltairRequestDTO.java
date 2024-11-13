@@ -13,7 +13,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 @Generated
-public class OffersAltairRequest {
+public class OffersAltairRequestDTO {
   // Fields to match BPMP82
   private String banco;
   private String canal;

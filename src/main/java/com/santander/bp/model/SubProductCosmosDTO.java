@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class SubProductCosmos {
+public class SubProductCosmosDTO {
   @JsonProperty("NM_SUBP")
   private String nmSubp;
 

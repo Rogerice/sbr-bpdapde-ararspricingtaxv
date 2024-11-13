@@ -13,7 +13,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 @Generated
-public class OffersAltairResponse {
+public class OffersAltairResponseDTO {
 
   // Fields to match BPMP820
   private String produto;

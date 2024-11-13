@@ -15,7 +15,7 @@ import lombok.Setter;
 @Builder
 @Generated
 @Data
-public class Whitelist {
+public class WhitelistDTO {
   private String cpfCnpj;
   private String agencia;
 }

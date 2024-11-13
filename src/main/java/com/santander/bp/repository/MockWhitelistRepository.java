@@ -1,6 +1,6 @@
 package com.santander.bp.repository;
 
-import com.santander.bp.model.WhitelistEntry;
+import com.santander.bp.model.WhitelistEntryDTO;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -9,24 +9,40 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class MockWhitelistRepository implements WhitelistRepository {
 
-  private final Map<String, WhitelistEntry> cpfWhitelist;
-  private final Map<String, WhitelistEntry> agencyWhitelist;
+  private final Map<String, WhitelistEntryDTO> whitelistEntries;
+  private final Map<String, WhitelistEntryDTO> agencyWhitelist;
 
   public MockWhitelistRepository() {
-    this.cpfWhitelist = new HashMap<>();
+    this.whitelistEntries = new HashMap<>();
     this.agencyWhitelist = new HashMap<>();
 
-    cpfWhitelist.put("12345678900", new WhitelistEntry("12345678900", "001", "Agência 001"));
-    agencyWhitelist.put("001", new WhitelistEntry("12345678900", "001", "Agência 001"));
+    whitelistEntries.put(
+        "CPF-12345678909", new WhitelistEntryDTO("CPF", "12345678909", "002", "Agência 002"));
+    whitelistEntries.put(
+        "CPF-98765432100", new WhitelistEntryDTO("CPF", "98765432100", "003", "Agência 003"));
+    whitelistEntries.put(
+        "CNPJ-12345678000195",
+        new WhitelistEntryDTO("CNPJ", "12345678000195", "006", "Agência 006"));
+    whitelistEntries.put(
+        "CNPJ-98765432000110",
+        new WhitelistEntryDTO("CNPJ", "98765432000110", "007", "Agência 007"));
+
+    agencyWhitelist.put("002", new WhitelistEntryDTO("CPF", "12345678909", "002", "Agência 002"));
+    agencyWhitelist.put("003", new WhitelistEntryDTO("CPF", "98765432100", "003", "Agência 003"));
+    agencyWhitelist.put(
+        "006", new WhitelistEntryDTO("CNPJ", "12345678000195", "006", "Agência 006"));
+    agencyWhitelist.put(
+        "007", new WhitelistEntryDTO("CNPJ", "98765432000110", "007", "Agência 007"));
   }
 
   @Override
-  public Optional<WhitelistEntry> findByCpf(String cpf) {
-    return Optional.ofNullable(cpfWhitelist.get(cpf));
+  public Optional<WhitelistEntryDTO> findByDocument(String documentType, String documentNumber) {
+    String key = documentType.toUpperCase() + "-" + documentNumber;
+    return Optional.ofNullable(whitelistEntries.get(key));
   }
 
   @Override
-  public Optional<WhitelistEntry> findByAgency(String agency) {
+  public Optional<WhitelistEntryDTO> findByAgency(String agency) {
     return Optional.ofNullable(agencyWhitelist.get(agency));
   }
 }

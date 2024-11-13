@@ -20,6 +20,6 @@ public class ErrorBuilderUtil {
   }
 
   public static Errors buildNotFoundError(String description) {
-    return buildError("NOT_LIST_ERROR", "No offers found", description, LevelEnum.INFO);
+    return buildError("NOT_FOUND", "No offers found", description, LevelEnum.INFO);
   }
 }

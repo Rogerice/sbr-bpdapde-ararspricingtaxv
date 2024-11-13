@@ -12,10 +12,11 @@ public class WhitelistService {
     this.whitelistRepository = whitelistRepository;
   }
 
-  public boolean isInWhitelist(String documentNumber, String centerId) {
-    if (whitelistRepository.findByCpf(documentNumber).isPresent()) {
-      return true;
-    }
+  public boolean isInWhitelist(String documentType, String documentNumber) {
+    return whitelistRepository.findByDocument(documentType, documentNumber).isPresent();
+  }
+
+  public boolean isAgencyInWhitelist(String centerId) {
     return whitelistRepository.findByAgency(centerId).isPresent();
   }
 }

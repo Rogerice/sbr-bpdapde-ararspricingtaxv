@@ -9,8 +9,9 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class WhitelistEntry {
-  private String cpf;
-  private String cnpj;
-  private String agencia;
+public class WhitelistEntryDTO {
+  private String documentType; // CPF ou CNPJ
+  private String documentNumber;
+  private String agencyCode;
+  private String agencyName;
 }
