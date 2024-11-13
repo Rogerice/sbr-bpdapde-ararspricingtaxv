@@ -28,7 +28,7 @@ public class CosmosDbService {
     List<OfferCosmos> offers = offerRepository.findOffers(cdSegm, channelCode, product);
 
     if (offers == null || offers.isEmpty()) {
-      logger.warn("No offers found for the given criteria.");
+      logger.warn("Nenhuma oferta encontrada para os critérios fornecidos.");
 
       throw new RestApiException(AppError.NOT_LIST_ERROR);
     }

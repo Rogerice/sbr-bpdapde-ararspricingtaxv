@@ -2,8 +2,6 @@ package com.santander.bp.integration.delegate;
 
 import com.santander.bp.api.OffersAndRatesApiDelegate;
 import com.santander.bp.exception.AltairException;
-import com.santander.bp.exception.CosmosDbException;
-import com.santander.bp.exception.RestApiException;
 import com.santander.bp.model.Error;
 import com.santander.bp.model.Error.LevelEnum;
 import com.santander.bp.model.Errors;
@@ -45,59 +43,67 @@ public class OffersAndRatesApiDelegateImpl implements OffersAndRatesApiDelegate 
                 offersPricingRequest.getSegment(), offersPricingRequest.getChannel(), "26");
 
         if (cosmosOffers.isEmpty()) {
-          throw new CosmosDbException(
-              "NOT_LIST_ERROR",
-              "No offers found",
-              "No offers were found with the specified criteria in CosmosDB");
+          future.complete(
+              ResponseEntity.status(HttpStatus.NOT_FOUND)
+                  .body(
+                      List.of(
+                          OffersPricingResponse.builder()
+                              .errors(
+                                  List.of(
+                                      Error.builder()
+                                          .code("NOT_LIST_ERROR")
+                                          .message("No offers found")
+                                          .level(LevelEnum.INFO)
+                                          .description(
+                                              "No offers were found with the specified criteria in CosmosDB")
+                                          .build()))
+                              .build())));
+        } else {
+          future.complete(ResponseEntity.ok(cosmosOffers));
         }
-
-        future.complete(ResponseEntity.ok(cosmosOffers));
       } else {
         List<OffersPricingResponse> response =
             offersPricingServiceBP82.processOffers(offersPricingRequest);
         future.complete(ResponseEntity.ok(response));
       }
-    } catch (Exception e) {
-      Errors errorResponse;
-      if (e instanceof CosmosDbException || e instanceof AltairException) {
-        int code = ((RestApiException) e).getCode();
-        String message = e.getMessage();
-        String description = ((AltairException) e).getDescription();
-
-        errorResponse =
-            Errors.builder()
-                .errors(
-                    List.of(
-                        Error.builder()
-                            // .code(code)
-                            .message(message)
-                            .level(LevelEnum.ERROR)
-                            .description(description)
-                            .build()))
-                .build();
-      } else {
-        // Tratamento de erro genérico
-        errorResponse =
-            Errors.builder()
-                .errors(
-                    List.of(
-                        Error.builder()
-                            .code("500")
-                            .message("Internal Server Errowrdfdsdsfr")
-                            .level(LevelEnum.ERROR)
-                            .description(e.getMessage())
-                            .build()))
-                .build();
-      }
+    } catch (AltairException e) {
+      Errors errorResponse =
+          Errors.builder()
+              .errors(
+                  List.of(
+                      Error.builder()
+                          .code(e.getCode())
+                          .message(e.getMessage())
+                          .level(LevelEnum.ERROR)
+                          .description(e.getDescription())
+                          .build()))
+              .build();
 
       OffersPricingResponse errorPricingResponse =
           OffersPricingResponse.builder().errors(errorResponse.getErrors()).build();
 
       ResponseEntity<List<OffersPricingResponse>> responseEntity =
-          ResponseEntity.status(
-                  e instanceof RestApiException
-                      ? ((RestApiException) e).getHttpStatus()
-                      : HttpStatus.INTERNAL_SERVER_ERROR)
+          ResponseEntity.status(HttpStatus.BAD_REQUEST).body(List.of(errorPricingResponse));
+
+      future.complete(responseEntity);
+    } catch (Exception e) {
+      Errors errorResponse =
+          Errors.builder()
+              .errors(
+                  List.of(
+                      Error.builder()
+                          .code("500")
+                          .message("Internal Server Error")
+                          .level(LevelEnum.ERROR)
+                          .description(e.getMessage())
+                          .build()))
+              .build();
+
+      OffersPricingResponse errorPricingResponse =
+          OffersPricingResponse.builder().errors(errorResponse.getErrors()).build();
+
+      ResponseEntity<List<OffersPricingResponse>> responseEntity =
+          ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
               .body(List.of(errorPricingResponse));
 
       future.complete(responseEntity);
