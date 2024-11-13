@@ -50,9 +50,35 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/OffersPricingResponse'
+                $ref: '#/components/schemas/ResponseWrapper'
+              example:
+                data:
+                  - id: "2a6777effe8f5b8c2df74a49dae5f98d"
+                    product: "26"
+                    product_description: "RENDA FIXA"
+                    family_code: "LCA"
+                    channel_code: "52"
+                    cd_segm: "ALL"
+                    tp_segm: "ALL"
+                    sub_products:
+                      - sub_product: "LCA SEL 361 DIG DIAS"
+                        sub_code: "0232"
+                        minimum_application_value: 1000
+                        minimum_redeem_value: 500
+                        minimum_balance_value: 1000
+                        progressive_remuneration_indicator: "N"
+                        indexer_description: "CDI"
+                        grace_indicator: "N"
+                        grace_term: "99999"
+                        other_term: "S"
+                        redeem_indicator: "S"
+                        future_schedule: "S"
+                        online_hour: "20:10:00"
+                        rate_details:
+                          - tax_rate: "00268000"
+                            tax_rate_description: "2,68% a.a."
+                            received_tax_rate: "00700000"
+                errors: []
         '204':
           $ref: "#/components/responses/NoContent"
         '400':
@@ -61,43 +87,84 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Errors"
+              example:
+                errors:
+                  - code: "ERR004"
+                    message: "Invalid request"
+                    level: "error"
+                    description: "The request parameters are invalid."
         '401':
           description: "Unauthorized"
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Errors"
+              example:
+                errors:
+                  - code: "ERR002"
+                    message: "Unauthorized access"
+                    level: "error"
+                    description: "You do not have permission to access this resource."
         '403':
           description: "Forbidden"
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Errors"
+              example:
+                errors:
+                  - code: "ERR003"
+                    message: "Forbidden access"
+                    level: "error"
+                    description: "Access to this resource is forbidden."
         '404':
           description: "Not Found"
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Errors"
+              example:
+                errors:
+                  - code: "ERR005"
+                    message: "Resource not found"
+                    level: "error"
+                    description: "The requested resource was not found."
         '500':
           description: "Server Error"
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Errors"
+              example:
+                errors:
+                  - code: "ERR006"
+                    message: "Internal server error"
+                    level: "error"
+                    description: "An unexpected error occurred on the server."
         '503':
           description: "Service Unavailable"
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Errors"
+              example:
+                errors:
+                  - code: "ERR007"
+                    message: "Service unavailable"
+                    level: "error"
+                    description: "The service is temporarily unavailable."
         '504':
           description: "Gateway timeout"
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Errors"
-
+              example:
+                errors:
+                  - code: "ERR008"
+                    message: "Gateway timeout"
+                    level: "error"
+                    description: "The request timed out while waiting for a response."
 components:
   schemas:
     OffersPricingRequest:
@@ -166,10 +233,28 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/SubProductDetails'
+    ResponseWrapper:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/OffersPricingResponse'
+          description: "List of offers and pricing responses"
+          example:
+            - id: "2a6777effe8f5b8c2df74a49dae5f98d"
+              product: "26"
+              product_description: "RENDA FIXA"
+              family_code: "LCA"
+              channel_code: "52"
+              cd_segm: "ALL"
+              tp_segm: "ALL"
         errors:
           type: array
           items:
             $ref: '#/components/schemas/Error'
+          description: "List of errors"
+          example: []
     SubProductDetails:
       type: object
       properties:
@@ -247,12 +332,9 @@ components:
           type: string
           description: "Received tax rate"
           example: "00700000"
-
     Errors:
       type: "object"
       description: "Data structure containing the details for errors"
-      required:
-        - errors
       properties:
         errors:
           description: "Array of errors"

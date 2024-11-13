@@ -36,30 +36,24 @@ public class OffersPricingServiceBP82 {
         "Iniciando o mapeamento da requisição para BPMP82. Dados recebidos: {}",
         offersPricingRequest);
 
-    // Mapeando a requisição para o formato esperado pelo Altair (BPMP82)
     BPMP82 bpmp82 = offersMapperBP82.mapOffersRequest(offersPricingRequest);
     log.info("Dados mapeados para BPMP82: {}", bpmp82);
 
-    // Enviando a requisição para o Altair
     ResponseDto altairReturn = sendMessageAltair(Transaction.BP82, bpmp82);
     log.info("Resposta do Altair recebida: {}", altairReturn);
 
-    // Verificando se a resposta do Altair contém mensagens de erro
     if (altairReturn.getObjeto().getListaMensagem() != null
         && !altairReturn.getObjeto().getListaMensagem().isEmpty()) {
 
-      // Pegando a primeira mensagem de erro para lançar a exceção
       String codigoErro = altairReturn.getObjeto().getListaMensagem().get(0).getCodigo();
       String mensagemErro = altairReturn.getObjeto().getListaMensagem().get(0).getMensagem();
 
       log.error(
           "Erro retornado pelo Altair MQ. Código: {}, Mensagem: {}", codigoErro, mensagemErro);
 
-      // Lançando uma exceção específica do Altair para ser tratada posteriormente
       throw new AltairException(codigoErro, mensagemErro, "Erro retornado pelo Altair MQ");
     }
 
-    // Se não houver erros, mapear a resposta para o formato esperado (OffersPricingResponse)
     List<OffersPricingResponse> responseList = offersMapperBP82.mapOffersResponseList(altairReturn);
     log.info("Lista de respostas mapeadas para OffersPricingResponse: {}", responseList);
 
