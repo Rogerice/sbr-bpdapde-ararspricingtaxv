@@ -1,11 +1,8 @@
 package com.santander.bp.service;
 
-import com.santander.bp.exception.AppError;
-import com.santander.bp.exception.RestApiException;
+import com.santander.bp.app.mapper.CosmosDbMapper;
 import com.santander.bp.model.OfferCosmos;
 import com.santander.bp.model.OffersPricingResponse;
-import com.santander.bp.model.SubProductCosmos;
-import com.santander.bp.model.SubProductDetails;
 import com.santander.bp.repository.OffersCosmosDb;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -18,51 +15,36 @@ import org.springframework.stereotype.Service;
 public class CosmosDbService {
 
   private static final Logger logger = LoggerFactory.getLogger(CosmosDbService.class);
+  private final OffersCosmosDb offerRepository;
+  private final CosmosDbMapper cosmosDbMapper;
 
-  @Autowired private OffersCosmosDb offerRepository;
+  @Autowired
+  public CosmosDbService(OffersCosmosDb offerRepository, CosmosDbMapper cosmosDbMapper) {
+    this.offerRepository = offerRepository;
+    this.cosmosDbMapper = cosmosDbMapper;
+  }
 
   public List<OffersPricingResponse> getOffers(String cdSegm, String channelCode, String product) {
+    logOfferSearch(cdSegm, channelCode, product);
+    List<OfferCosmos> offers = findOffers(cdSegm, channelCode, product);
+    return mapOffersToResponses(offers);
+  }
+
+  private void logOfferSearch(String cdSegm, String channelCode, String product) {
     logger.info(
         "Searching offers, segment: {}, channel: {}, product: {}", cdSegm, channelCode, product);
+  }
 
+  private List<OfferCosmos> findOffers(String cdSegm, String channelCode, String product) {
     List<OfferCosmos> offers = offerRepository.findOffers(cdSegm, channelCode, product);
-
     if (offers == null || offers.isEmpty()) {
       logger.warn("Nenhuma oferta encontrada para os critérios fornecidos.");
-
-      throw new RestApiException(AppError.NOT_LIST_ERROR);
+      return List.of(); // Retorna uma lista vazia
     }
-
-    return offers.stream().map(this::mapToOfferResponseDTO).collect(Collectors.toList());
+    return offers;
   }
 
-  private OffersPricingResponse mapToOfferResponseDTO(OfferCosmos offer) {
-    return OffersPricingResponse.builder()
-        .id(offer.getId())
-        .product(offer.getProduct())
-        .productDescription(offer.getProductDescription())
-        .familyCode(offer.getFamilyCode())
-        .subProducts(
-            offer.getSubProducts().stream()
-                .map(this::mapToSubProductDetails)
-                .collect(Collectors.toList()))
-        .build();
-  }
-
-  private SubProductDetails mapToSubProductDetails(SubProductCosmos subProduct) {
-    return SubProductDetails.builder()
-        .subProduct(subProduct.getNmSubp())
-        .minimumApplicationValue(
-            subProduct.getVlMiniApli() != null ? subProduct.getVlMiniApli().floatValue() : null)
-        .minimumRedeemValue(
-            subProduct.getVlMiniResg() != null ? subProduct.getVlMiniResg().floatValue() : null)
-        .minimumBalanceValue(
-            subProduct.getVlMiniSald() != null ? subProduct.getVlMiniSald().floatValue() : null)
-        .progressiveRemunerationIndicator(subProduct.getInRemuPgre())
-        .indexerDescription(subProduct.getDsIndx())
-        .subCode(subProduct.getCdSubp())
-        .graceIndicator(subProduct.getInCare())
-        .graceTerm(subProduct.getPzRemuPgre())
-        .build();
+  private List<OffersPricingResponse> mapOffersToResponses(List<OfferCosmos> offers) {
+    return offers.stream().map(cosmosDbMapper::mapToOfferResponseDTO).collect(Collectors.toList());
   }
 }

@@ -20,23 +20,6 @@ paths:
         - Offers and Rates
       summary: "Fetches investment offers and associated fees for fixed income products, returning combined data."
       description: "This endpoint retrieves offers and their associated fees. The returned data is combined to provide a complete view of available investment options based on customer and market segment."
-      parameters:
-        - in: query
-          name: _limit
-          description: "Limit value for pagination"
-          required: false
-          schema:
-            type: integer
-            format: int32
-            example: 10
-        - in: query
-          name: _offset
-          description: "Offset value for pagination"
-          required: false
-          schema:
-            type: integer
-            format: int32
-            example: 0
       requestBody:
         description: "Data to be received for retrieving offers and fees"
         content:
@@ -51,102 +34,24 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ResponseWrapper'
-              example:
-                data:
-                  - id: "2a6777effe8f5b8c2df74a49dae5f98d"
-                    product: "26"
-                    product_description: "RENDA FIXA"
-                    family_code: "LCA"
-                    channel_code: "52"
-                    cd_segm: "ALL"
-                    tp_segm: "ALL"
-                    sub_products:
-                      - sub_product: "LCA SEL 361 DIG DIAS"
-                        sub_code: "0232"
-                        minimum_application_value: 1000
-                        minimum_redeem_value: 500
-                        minimum_balance_value: 1000
-                        progressive_remuneration_indicator: "N"
-                        indexer_description: "CDI"
-                        grace_indicator: "N"
-                        grace_term: "99999"
-                        other_term: "S"
-                        redeem_indicator: "S"
-                        future_schedule: "S"
-                        online_hour: "20:10:00"
-                        rate_details:
-                          - tax_rate: "00268000"
-                            tax_rate_description: "2,68% a.a."
-                            received_tax_rate: "00700000"
-                errors: []
-        '204':
-          $ref: "#/components/responses/NoContent"
         '400':
           description: "Bad Request"
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Errors"
-              example:
-                errors:
-                  - code: "ERR004"
-                    message: "Invalid request"
-                    level: "error"
-                    description: "The request parameters are invalid."
-        '401':
-          description: "Unauthorized"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Errors"
-              example:
-                errors:
-                  - code: "ERR002"
-                    message: "Unauthorized access"
-                    level: "error"
-                    description: "You do not have permission to access this resource."
-        '403':
-          description: "Forbidden"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Errors"
-              example:
-                errors:
-                  - code: "ERR003"
-                    message: "Forbidden access"
-                    level: "error"
-                    description: "Access to this resource is forbidden."
-        '404':
-          description: "Not Found"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Errors"
-              example:
-                errors:
-                  - code: "ERR005"
-                    message: "Resource not found"
-                    level: "error"
-                    description: "The requested resource was not found."
+                $ref: '#/components/schemas/Errors'
         '500':
-          description: "Server Error"
+          description: "Internal Server Error"
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Errors"
-              example:
-                errors:
-                  - code: "ERR006"
-                    message: "Internal server error"
-                    level: "error"
-                    description: "An unexpected error occurred on the server."
+                $ref: '#/components/schemas/Errors'
         '503':
-          description: "Service Unavailable"
+          description: "Service Unavailable."
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Errors"
+                $ref: '#/components/schemas/Errors'
               example:
                 errors:
                   - code: "ERR007"
@@ -154,11 +59,11 @@ paths:
                     level: "error"
                     description: "The service is temporarily unavailable."
         '504':
-          description: "Gateway timeout"
+          description: "Gateway timeout."
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Errors"
+                $ref: '#/components/schemas/Errors'
               example:
                 errors:
                   - code: "ERR008"
@@ -169,65 +74,69 @@ components:
   schemas:
     OffersPricingRequest:
       type: object
+      required:
+        - document_type
+        - customer_id
+        - document_number
       properties:
         document_type:
           type: string
-          description: "Document type"
+          description: "Document type."
           example: "CPF"
         customer_id:
           type: string
-          description: "Customer ID"
+          description: "Customer ID."
           example: "123456"
         document_number:
           type: string
-          description: "Document number"
+          description: "Document number."
           example: "34034505445"
         segment:
           type: string
-          description: "Customer market segment"
+          description: "Customer market segment."
           example: "12"
         channel:
           type: string
-          description: "Request channel"
+          description: "Request channel."
           example: "77"
         center_id:
           type: string
-          description: "Center ID (Agency)"
+          description: "Center ID (Agency)."
           example: "0025"
-        productFamily:
+        product_family:
           type: string
-          description: "Product family name (e.g., CDB)"
+          description: "Product family name (e.g., CDB)."
           example: "CDB"
     OffersPricingResponse:
       type: object
       properties:
         id:
           type: string
-          description: "Offer identifier"
+          description: "Offer identifier."
           example: "2a6777effe8f5b8c2df74a49dae5f98d"
         product:
           type: string
-          description: "Product name"
+          description: "Product name."
           example: "26"
         product_description:
           type: string
-          description: "Description of the product"
+          description: "Description of the product."
           example: "RENDA FIXA"
         family_code:
           type: string
-          description: "Family code of the product"
+          description: "Family code of the product."
           example: "LCA"
         channel_code:
           type: string
-          description: "Channel code"
+          description: "Channel code."
           example: "52"
         cd_segm:
           type: string
-          description: "Segment code"
+          description: "Segment code."
           example: "ALL"
         tp_segm:
           type: string
-          description: "Segment type"
+          description: "Segment type."
           example: "ALL"
         sub_products:
           type: array
@@ -241,14 +150,6 @@ components:
           items:
             $ref: '#/components/schemas/OffersPricingResponse'
           description: "List of offers and pricing responses"
-          example:
-            - id: "2a6777effe8f5b8c2df74a49dae5f98d"
-              product: "26"
-              product_description: "RENDA FIXA"
-              family_code: "LCA"
-              channel_code: "52"
-              cd_segm: "ALL"
-              tp_segm: "ALL"
         errors:
           type: array
           items:
@@ -260,58 +161,58 @@ components:
       properties:
         sub_product:
           type: string
-          description: "Subproduct name"
+          description: "Subproduct name."
           example: "LCA SEL 361 DIG DIAS"
         sub_code:
           type: string
-          description: "Subproduct Code"
+          description: "Subproduct code."
           example: "0232"
         minimum_application_value:
           type: number
           format: float
-          description: "Minimum application value"
+          description: "Minimum application value."
           example: 1000
         minimum_redeem_value:
           type: number
           format: float
-          description: "Minimum redeem value"
+          description: "Minimum redeem value."
           example: 500
         minimum_balance_value:
           type: number
           format: float
-          description: "Minimum balance value"
+          description: "Minimum balance value."
           example: 1000
         progressive_remuneration_indicator:
           type: string
-          description: "Indicator if progressive remuneration is applied"
+          description: "Indicator if progressive remuneration is applied."
           example: "N"
         indexer_description:
           type: string
-          description: "Description of the indexer"
+          description: "Description of the indexer."
           example: "CDI"
         grace_indicator:
           type: string
-          description: "Grace Period Indicator"
+          description: "Grace period indicator."
           example: "N"
         grace_term:
           type: string
-          description: "Grace Period Term"
+          description: "Grace period term."
           example: "99999"
         other_term:
           type: string
-          description: "Other term indicator"
+          description: "Other term indicator."
           example: "S"
         redeem_indicator:
           type: string
-          description: "Redeem indicator"
+          description: "Redeem indicator."
           example: "S"
         future_schedule:
           type: string
-          description: "Future schedule indicator"
+          description: "Future schedule indicator."
           example: "S"
         online_hour:
           type: string
-          description: "Online hour information"
+          description: "Online hour information."
           example: "20:10:00"
         rate_details:
           type: array
@@ -322,62 +223,62 @@ components:
       properties:
         tax_rate:
           type: string
-          description: "Encoded tax rate"
+          description: "Encoded tax rate, typically a string representing basis points."
           example: "00268000"
         tax_rate_description:
           type: string
-          description: "Tax rate description"
+          description: "Human-readable tax rate description."
           example: "2,68% a.a."
         received_tax_rate:
           type: string
-          description: "Received tax rate"
+          description: "Received tax rate from an external service."
           example: "00700000"
     Errors:
-      type: "object"
-      description: "Data structure containing the details for errors"
+      type: object
+      description: "Data structure containing the details for errors."
       properties:
         errors:
-          description: "Array of errors"
-          type: "array"
+          type: array
           items:
-            $ref: "#/components/schemas/Error"
+            $ref: '#/components/schemas/Error'
+          description: "Array of errors."
     Error:
-      type: "object"
-      description: "Data structure containing the error details"
+      type: object
+      description: "Data structure containing the error details."
       required:
         - code
         - message
         - level
       properties:
         code:
-          type: "string"
-          description: "Unique alphanumeric human-readable error code"
+          type: string
+          description: "Unique alphanumeric human-readable error code."
           example: "ERR001"
         message:
-          type: "string"
-          description: "Brief summary of the reported issue"
+          type: string
+          description: "Brief summary of the reported issue."
           example: "Invalid Action"
         level:
-          type: "string"
-          description: "Level of the reported issue"
+          type: string
+          description: "Level of the reported issue."
           enum:
             - info
             - warning
             - error
           example: "error"
         description:
-          type: "string"
-          description: "Detailed description of the reported issue"
-          example: "Description"
+          type: string
+          description: "Detailed description of the reported issue."
+          example: "The request parameter is invalid."
   responses:
     NoContent:
-      description: "No content"
+      description: "No content."
     Unauthorized:
-      description: "Unauthorized"
+      description: "Unauthorized."
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/Errors"
+            $ref: '#/components/schemas/Errors'
           example:
             errors:
               - code: "ERR002"
@@ -385,11 +286,11 @@ components:
                 level: "error"
                 description: "You do not have permission to access this resource."
     Forbidden:
-      description: "Forbidden"
+      description: "Forbidden."
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/Errors"
+            $ref: '#/components/schemas/Errors'
           example:
             errors:
               - code: "ERR003"
@@ -397,11 +298,11 @@ components:
                 level: "error"
                 description: "Access to this resource is forbidden."
     BadRequest:
-      description: "Bad Request"
+      description: "Bad Request."
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/Errors"
+            $ref: '#/components/schemas/Errors'
           example:
             errors:
               - code: "ERR004"
@@ -409,11 +310,11 @@ components:
                 level: "error"
                 description: "The request parameters are invalid."
     NotFound:
-      description: "Not Found"
+      description: "Not Found."
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/Errors"
+            $ref: '#/components/schemas/Errors'
           example:
             errors:
               - code: "ERR005"
@@ -421,11 +322,11 @@ components:
                 level: "error"
                 description: "The requested resource was not found."
     InternalServerError:
-      description: "Server Error"
+      description: "Server Error."
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/Errors"
+            $ref: '#/components/schemas/Errors'
           example:
             errors:
               - code: "ERR006"
@@ -433,11 +334,11 @@ components:
                 level: "error"
                 description: "An unexpected error occurred on the server."
     ServiceUnavailable:
-      description: "Service Unavailable"
+      description: "Service Unavailable."
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/Errors"
+            $ref: '#/components/schemas/Errors'
           example:
             errors:
               - code: "ERR007"
@@ -445,11 +346,11 @@ components:
                 level: "error"
                 description: "The service is temporarily unavailable."
     GatewayTimeout:
-      description: "Gateway timeout"
+      description: "Gateway timeout."
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/Errors"
+            $ref: '#/components/schemas/Errors'
           example:
             errors:
               - code: "ERR008"
