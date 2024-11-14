@@ -1,0 +1,5 @@
+canary:
+  enable: false
+  env:
+  - BLUE
+  - GREEN

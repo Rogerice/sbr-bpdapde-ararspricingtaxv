@@ -3,7 +3,7 @@
     "timeout": 120000,
     "registry": {
         "search": [
-            "http://artifactory.produbanbr.corp/artifactory/api/bower/bower-public/"
+            "http://artifactory.santanderbr.corp/artifactory/api/bower/bower-public/"
         ]
     },
     "resolvers" : [ "bower-art-resolver" ],
