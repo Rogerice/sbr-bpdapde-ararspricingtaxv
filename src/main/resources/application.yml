@@ -8,7 +8,7 @@ spring:
     version: "3.10.0"
     description: "Archetype for generating Arsenal applications"
   jackson:
-    default-property-inclusion: NON_NULL  # Adicione esta linha para uso de NOTNULL em Json
+    default-property-inclusion: NON_NULL
   security:
     oauth2:
       resourceserver:
@@ -29,7 +29,7 @@ server:
   servlet:
     encoding:
       charset: UTF-8
-  #context-path: /ars-pricing-tax-v1
+  context-path: /ars-pricing-tax-v1
 azure:
   cosmos:
     uri: ${DATABASE_URL:https://sbrd1zb1cdbbp0brscomm002.documents.azure.com:443/}
