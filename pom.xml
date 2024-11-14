@@ -3,21 +3,18 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-
 	<parent>
 		<groupId>com.santander.ars</groupId>
 		<artifactId>gln-back-arsenal-backend-lib-parent</artifactId>
 		<version>3.12.3</version>
 	</parent>
-
 	<groupId>com.santander.bp</groupId>
 	<artifactId>ars-pricing-tax-v1</artifactId>
 	<version>0.1.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 	<name>AppArsenal Microservice Arsenal Back-End</name>
-	<description>Arsenal Back-End Microservice - Generated to AppArsenal</description>
-
-	<!-- Nao Remover -->
+	<description>Arsenal Back-End Microservice - Generated to AppArsenal</description> <!--
+	Nao Remover -->
 	<organization>
 		<name>Santander Tecnologia</name>
 		<url>https://www.santander.com.br</url>
@@ -30,16 +27,13 @@
 			<comments>####415253454E414C####</comments>
 		</license>
 	</licenses>
-
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.compiler.target>17</maven.compiler.target>
 		<maven.compiler.source>17</maven.compiler.source>
 		<archetype.key>####415253454E414C####</archetype.key>
 	</properties>
-
-	<dependencies>
-		<!-- Arsenal Libraries -->
+	<dependencies>  <!-- Arsenal Libraries -->
 		<dependency>
 			<groupId>com.santander.ars</groupId>
 			<artifactId>gln-back-arsenal-backend-api-starter</artifactId>
@@ -48,35 +42,34 @@
 			<groupId>com.santander.ars</groupId>
 			<artifactId>gln-back-arsenal-backend-error-starter</artifactId>
 		</dependency>
-
 		<dependency>
 			<groupId>com.santander.ars</groupId>
 			<artifactId>gln-back-arsenal-backend-telemetry-log-starter</artifactId>
 		</dependency>
-
 		<dependency>
 			<groupId>com.santander.ars</groupId>
 			<artifactId>gln-back-arsenal-backend-test-starter</artifactId>
 			<scope>test</scope>
 		</dependency>
-
 		<dependency>
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-web</artifactId>
-		</dependency>
-
-		<!--Altair - Transação-->
+		</dependency>  <!--Altair - Transação-->
 		<dependency>
 			<groupId>br.com.santander.ars</groupId>
 			<artifactId>arsenal-lib-altair</artifactId>
 			<version>2.0.0</version>
-		</dependency>
-
-		<!--Comos DB-->
+		</dependency>  <!--Comos DB-->
 		<dependency>
 			<groupId>com.azure</groupId>
 			<artifactId>azure-spring-data-cosmos</artifactId>
 			<version>5.12.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.azure</groupId>
+			<artifactId>azure-core</artifactId>
+			<version>1.41.0</version>
 		</dependency>
 
 		<dependency>
@@ -200,14 +193,13 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<configuration>
-					<source>${java.version}</source>
-					<target>${java.version}</target>
+					<source>17</source>
+					<target>17</target>
 					<annotationProcessorPaths>
 						<path>
 							<groupId>org.projectlombok</groupId>
 							<artifactId>lombok</artifactId>
 							<version>${lombok.version}</version>
-							<scope>provided</scope>
 						</path>
 						<path>
 							<groupId>org.mapstruct</groupId>
@@ -216,9 +208,7 @@
 						</path>
 					</annotationProcessorPaths>
 					<compilerArgs>
-						<compilerArg>
-							-Amapstruct.defaultComponentModel=spring
-						</compilerArg>
+						<compilerArg>-Amapstruct.defaultComponentModel=spring</compilerArg>
 						<compilerArg>-parameters</compilerArg>
 					</compilerArgs>
 				</configuration>
@@ -231,4 +221,4 @@
 			</resource>
 		</resources>
 	</build>
-</project>
+</project> 

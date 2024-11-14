@@ -3,7 +3,7 @@ package com.santander.bp.service;
 import com.santander.bp.app.mapper.CosmosDbMapper;
 import com.santander.bp.model.OfferCosmosDTO;
 import com.santander.bp.model.OffersPricingResponse;
-import com.santander.bp.repository.OffersCosmosDb;
+import com.santander.bp.repository.OffersCosmosDbRepository;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
@@ -15,11 +15,11 @@ import org.springframework.stereotype.Service;
 public class CosmosDbService {
 
   private static final Logger logger = LoggerFactory.getLogger(CosmosDbService.class);
-  private final OffersCosmosDb offerRepository;
+  private final OffersCosmosDbRepository offerRepository;
   private final CosmosDbMapper cosmosDbMapper;
 
   @Autowired
-  public CosmosDbService(OffersCosmosDb offerRepository, CosmosDbMapper cosmosDbMapper) {
+  public CosmosDbService(OffersCosmosDbRepository offerRepository, CosmosDbMapper cosmosDbMapper) {
     this.offerRepository = offerRepository;
     this.cosmosDbMapper = cosmosDbMapper;
   }

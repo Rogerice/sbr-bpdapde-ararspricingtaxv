@@ -14,7 +14,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 @CucumberOptions(
     features = "src/test/resources/features",
     plugin = {"pretty", "html:target/reports/api.html"},
-    glue = {"com.santander.bp.api"})
+    glue = {"com.santander.bp.api.steps", "com.santander.bp.config"})
 @SpringBootTest(
     classes = ArsenalApplication.class,
     webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)

@@ -8,7 +8,7 @@ import static org.mockito.Mockito.when;
 import com.santander.bp.app.mapper.CosmosDbMapper;
 import com.santander.bp.model.OfferCosmosDTO;
 import com.santander.bp.model.OffersPricingResponse;
-import com.santander.bp.repository.OffersCosmosDb;
+import com.santander.bp.repository.OffersCosmosDbRepository;
 import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,7 +19,7 @@ import org.mockito.MockitoAnnotations;
 
 class CosmosDbServiceTest {
 
-  @Mock private OffersCosmosDb offerRepository;
+  @Mock private OffersCosmosDbRepository offerRepository;
 
   @Mock private CosmosDbMapper cosmosDbMapper;
 

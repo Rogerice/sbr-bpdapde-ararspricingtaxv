@@ -8,7 +8,7 @@ import java.util.List;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface OffersCosmosDb extends CosmosRepository<OfferCosmosDTO, String> {
+public interface OffersCosmosDbRepository extends CosmosRepository<OfferCosmosDTO, String> {
 
   @Query(
       "SELECT * FROM c WHERE c.cd_segm = @cdSegm AND c.channel_code = @channelCode AND c.product = @product")

@@ -26,10 +26,10 @@ server:
   #context-path: /ars-pricing-tax-v1
 azure:
   cosmos:
-    uri: ${DATABASE_URL}
-    key: ${DATABASE_KEY}
-    database: ${DATABASE_NAME}
-    connectionType: ${CONNECTION_TYPE}
+    uri: ${DATABASE_URL:https://sbrd1zb1cdbbp0brscomm002.documents.azure.com:443/}
+    key: ${DATABASE_KEY:rN3Biqi2aRXf8g50RswQzpYpJWQE51295bQe1kn4MVBYgKhCnLN06HFl3SZnPtX49wnKzZiVVlTHACDbY21hlg==}
+    database: ${DATABASE_NAME:bp}
+    connectionType: ${CONNECTION_TYPE:KEY}
     queryMetricsEnabled: false      
 # Arsenal core library settings
 arsenal:
@@ -49,7 +49,7 @@ arsenal:
       response-queue: ${ALTAIR_MQ_QUEUE_RESPONSE_NAME}
       server:
         hostname: ${ALTAIR_MQ_QUEUE_SERVER_HOSTNAME}
-        port: ${ALTAIR_MQ_QUEUE_SERVER_PORT}
+        port: ${ALTAIR_MQ_QUEUE_SERVER_PORT:1414}
         channel: ${ALTAIR_MQ_CHANNEL}
         username: username
         pwd: password
@@ -119,3 +119,8 @@ management:
       enabled: true
     readinessState:
       enabled: true
+
+# Cucumber settings
+cucumber:
+  publish:
+    quiet: true
