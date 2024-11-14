@@ -1,3 +1,4 @@
+
 # Spring Boot application properties
 spring:
   main:
@@ -8,6 +9,11 @@ spring:
     description: "Archetype for generating Arsenal applications"
   jackson:
     default-property-inclusion: NON_NULL  # Adicione esta linha para uso de NOTNULL em Json
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: ${HOST_RHSSO}/auth/realms/${RHSSO_REALM}/protocol/openid-connect/certs
 
 # Dados exibidos no endpoint "info" do Actuator
 info:
