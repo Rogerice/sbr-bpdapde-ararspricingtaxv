@@ -21,6 +21,8 @@ environment:
       repository: null
     appScan:
       repository: null
+    cloudProvider: &id001
+    - OC
   pi:
     smokeTest:
       type: null
@@ -45,6 +47,7 @@ environment:
       repository: null
     appScan:
       repository: null
+    cloudProvider: *id001
   blue:
     smokeTest:
       type: SCRIPT_SHELL
@@ -60,3 +63,10 @@ environment:
       repository: null
     appScan:
       repository: null
+    cloudProvider: &id002
+    - OC
+  green:
+    cloudProvider: *id002
+acronymTargetCluster: BP
+infraVersionFile: version.yml
+matriculaPO: T605962
