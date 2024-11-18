@@ -28,7 +28,7 @@ server:
   servlet:
     encoding:
       charset: UTF-8
-  context-path: /ars-pricing-tax-v1
+    context-path: /ars-pricing-tax-v1
 azure:
   cosmos:
     uri: ${DATABASE_URL:https://sbrd1zb1cdbbp0brscomm002.documents.azure.com:443/}

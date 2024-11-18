@@ -36,7 +36,7 @@ env:
   - name: APP_NAME
     value: ars-pricing-tax-v1
 probe:
-    path: /actuator/health
+    path: /ars-pricing-tax-v1/actuator/health
     port: http
     initialDelaySecondsLiveness: 60
     initialDelaySecondsReadness: 60
