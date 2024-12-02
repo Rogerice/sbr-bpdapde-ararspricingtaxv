@@ -1,8 +1,10 @@
 package com.santander.bp.exception;
 
+import lombok.Generated;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
+@Generated
 @Getter
 public enum AppError {
   NOT_FOUND("171", HttpStatus.NOT_FOUND, "Cosmos", "Erro lista de erro retorno Cosmos", null),
