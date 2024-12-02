@@ -1,5 +1,8 @@
 package com.santander.bp.enums;
 
+import lombok.Generated;
+
+@Generated
 public enum FixedFieldsEnum {
   BANCO("0033"),
   PRODUTO("26");

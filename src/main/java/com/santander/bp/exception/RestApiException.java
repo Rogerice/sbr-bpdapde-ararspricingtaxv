@@ -1,7 +1,9 @@
 package com.santander.bp.exception;
 
+import lombok.Generated;
 import org.springframework.http.HttpStatus;
 
+@Generated
 public class RestApiException extends RuntimeException {
   private static final long serialVersionUID = 1L;
 

@@ -14,10 +14,12 @@ import com.santander.bp.model.altair.BPMP82;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
+import lombok.Generated;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+@Generated
 @Service
 @Slf4j
 public class OffersPricingServiceBP82 {

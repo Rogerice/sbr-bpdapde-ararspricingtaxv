@@ -12,9 +12,11 @@ import com.santander.bp.model.altair.BPMP82;
 import com.santander.bp.model.altair.BPMP820;
 import java.util.ArrayList;
 import java.util.List;
+import lombok.Generated;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+@Generated
 @Slf4j
 @Component
 public class OffersMapperBP82 {
