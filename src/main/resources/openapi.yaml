@@ -75,19 +75,19 @@ components:
     OffersPricingRequest:
       type: object
       required:
-        - document_type
-        - customer_id
-        - document_number
+        - documentType
+        - customerId
+        - documentNumber
       properties:
-        document_type:
+        documentType:
           type: string
           description: "Document type."
           example: "CPF"
-        customer_id:
+        customerId:
           type: string
           description: "Customer ID."
           example: "123456"
-        document_number:
+        documentNumber:
           type: string
           description: "Document number."
           example: "34034505445"
@@ -99,14 +99,34 @@ components:
           type: string
           description: "Request channel."
           example: "77"
-        center_id:
+        centerId:
           type: string
           description: "Center ID (Agency)."
           example: "0025"
-        product_family:
+        productFamily:
           type: string
           description: "Product family name (e.g., CDB)."
           example: "CDB"
+        indicatorRecall:
+          type: string
+          description: "Indicator of realization (Indicador de Rechamada)."
+          example: "Y"
+        cdRecall:
+          type: string
+          description: "Real product code (Código do Produto da Rechamada)."
+          example: "26"
+        subProductRecall:
+          type: string
+          description: "Real subproduct code (Código do Subproduto da Rechamada)."
+          example: "0103"
+        funcType:
+          type: string
+          description: "Type of functionality for Application or Rescue"
+          example: "R"
+        subProduct:
+          type: string
+          description: "By-product chosen in the offer"
+          example: "LCI - Invest"
     OffersPricingResponse:
       type: object
       properties:
@@ -118,27 +138,27 @@ components:
           type: string
           description: "Product name."
           example: "26"
-        product_description:
+        productDescription:
           type: string
           description: "Description of the product."
           example: "RENDA FIXA"
-        family_code:
+        familyCode:
           type: string
           description: "Family code of the product."
           example: "LCA"
-        channel_code:
+        channelCode:
           type: string
           description: "Channel code."
           example: "52"
-        cd_segm:
+        cdSegm:
           type: string
           description: "Segment code."
           example: "ALL"
-        tp_segm:
+        tpSegm:
           type: string
           description: "Segment type."
           example: "ALL"
-        sub_products:
+        subProducts:
           type: array
           items:
             $ref: '#/components/schemas/SubProductDetails'

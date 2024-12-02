@@ -3,6 +3,7 @@ package com.santander.bp.app.mapper;
 import com.altec.bsbr.fw.altair.dto.ResponseDto;
 import com.altec.bsbr.fw.ps.parser.object.PsError;
 import com.altec.bsbr.fw.ps.parser.object.PsScreen;
+import com.santander.bp.enums.FixedFieldsEnum;
 import com.santander.bp.model.OffersPricingRequest;
 import com.santander.bp.model.OffersPricingResponse;
 import com.santander.bp.model.RateDetails;
@@ -20,17 +21,17 @@ public class OffersMapperBP82 {
 
   public BPMP82 mapOffersRequest(OffersPricingRequest offersPricingRequest) {
     BPMP82 bpmp82 = new BPMP82();
-    bpmp82.setBANCO("0033");
+    bpmp82.setBANCO(FixedFieldsEnum.BANCO.getValue());
     bpmp82.setCANAL(offersPricingRequest.getChannel());
-    bpmp82.setPRODUTO("26");
-    bpmp82.setSUBPROD("");
+    bpmp82.setPRODUTO(FixedFieldsEnum.PRODUTO.getValue());
+    bpmp82.setSUBPROD(offersPricingRequest.getSubProduct());
     bpmp82.setFAMILIA(offersPricingRequest.getProductFamily());
     bpmp82.setPENUMPE(offersPricingRequest.getCustomerId());
-    bpmp82.setSEGMENT("");
-    bpmp82.setTPFUNC("A");
-    bpmp82.setINDREA("N");
-    bpmp82.setPRODREA("");
-    bpmp82.setSUBPREA("");
+    bpmp82.setSEGMENT(offersPricingRequest.getSegment());
+    bpmp82.setTPFUNC(offersPricingRequest.getFuncType()); // A ou R
+    bpmp82.setINDREA(offersPricingRequest.getIndicatorRecall());
+    bpmp82.setPRODREA(offersPricingRequest.getCdRecall());
+    bpmp82.setSUBPREA(offersPricingRequest.getSubProductRecall());
     return bpmp82;
   }
 
@@ -39,24 +40,7 @@ public class OffersMapperBP82 {
 
     log.info("ResponseDto recebido: {}", responseDto);
 
-    if (responseDto.getObjeto().getListaErros() != null
-        && !responseDto.getObjeto().getListaErros().isEmpty()) {
-      log.warn("Lista de erros encontrada no ResponseDto:");
-      responseDto
-          .getObjeto()
-          .getListaErros()
-          .forEach(
-              erro -> {
-                if (erro instanceof PsError) {
-                  PsError psError = (PsError) erro;
-                  log.warn(
-                      "Código do Erro: {}, Mensagem do Erro: {}",
-                      psError.getCodigo(),
-                      psError.getMensagem());
-                }
-              });
-      return offersResponseList;
-    }
+    handleErrors(responseDto);
 
     if (responseDto.getObjeto().getListaFormatos() != null
         && !responseDto.getObjeto().getListaFormatos().isEmpty()) {
@@ -81,14 +65,41 @@ public class OffersMapperBP82 {
     return offersResponseList;
   }
 
+  private void handleErrors(ResponseDto responseDto) {
+    if (responseDto.getObjeto().getListaErros() != null
+        && !responseDto.getObjeto().getListaErros().isEmpty()) {
+      log.warn("Lista de erros encontrada no ResponseDto:");
+      responseDto
+          .getObjeto()
+          .getListaErros()
+          .forEach(
+              erro -> {
+                if (erro instanceof PsError) {
+                  PsError psError = (PsError) erro;
+                  log.warn(
+                      "Código do Erro: {}, Mensagem do Erro: {}",
+                      psError.getCodigo(),
+                      psError.getMensagem());
+                }
+              });
+    }
+  }
+
   private OffersPricingResponse construirOffersPricingResponse(BPMP820 bpmp820) {
     OffersPricingResponse response = new OffersPricingResponse();
     response.setProduct(bpmp820.getPRODUTO());
     response.setProductDescription(bpmp820.getDESSUBP());
     response.setFamilyCode(bpmp820.getFAMILIA());
 
-    // Criação dos detalhes do subproduto
     List<SubProductDetails> subProducts = new ArrayList<>();
+    SubProductDetails subProduct = construirSubProduto(bpmp820);
+    subProducts.add(subProduct);
+    response.setSubProducts(subProducts);
+
+    return response;
+  }
+
+  private SubProductDetails construirSubProduto(BPMP820 bpmp820) {
     SubProductDetails subProduct = new SubProductDetails();
     subProduct.setSubProduct(bpmp820.getSUBPROD());
     subProduct.setMinimumApplicationValue((float) bpmp820.getVLRMINA());
@@ -103,7 +114,6 @@ public class OffersMapperBP82 {
     subProduct.setFutureSchedule(bpmp820.getAGNFUTU());
     subProduct.setOnlineHour(bpmp820.getHRONLIN());
 
-    // Criação dos detalhes de taxas
     List<RateDetails> rateDetailsList = new ArrayList<>();
     RateDetails rateDetails = new RateDetails();
     rateDetails.setTaxRate(String.valueOf(bpmp820.getTAXAENC()));
@@ -112,10 +122,6 @@ public class OffersMapperBP82 {
     rateDetailsList.add(rateDetails);
 
     subProduct.setRateDetails(rateDetailsList);
-
-    subProducts.add(subProduct);
-    response.setSubProducts(subProducts);
-
-    return response;
+    return subProduct;
   }
 }

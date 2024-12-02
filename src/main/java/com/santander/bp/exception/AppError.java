@@ -5,7 +5,7 @@ import org.springframework.http.HttpStatus;
 
 @Getter
 public enum AppError {
-  NOT_FOUND("171", HttpStatus.NOT_FOUND, "TESTE DE ERRO COMOSOS", "LIST ERRO COSMOS", null),
+  NOT_FOUND("171", HttpStatus.NOT_FOUND, "Cosmos", "Erro lista de erro retorno Cosmos", null),
 
   ALTAIR_ERROR(
       "157",

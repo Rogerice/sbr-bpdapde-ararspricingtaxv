@@ -11,7 +11,6 @@ public class RestApiException extends RuntimeException {
   private final String message;
   private final Object details;
 
-  // Construtor padrão utilizando AppError
   public RestApiException(AppError appError) {
     super(appError.getMessage());
     this.httpStatus = appError.getHttpStatus();
@@ -21,7 +20,6 @@ public class RestApiException extends RuntimeException {
     this.details = appError.getDetails();
   }
 
-  // Novo construtor para permitir informações customizadas
   public RestApiException(
       HttpStatus httpStatus, String code, String title, String message, Object details) {
     super(message);
@@ -32,11 +30,9 @@ public class RestApiException extends RuntimeException {
     this.details = details;
   }
 
-  // Construtor para ser usado especificamente com mensagem de erro do Altair
   public RestApiException(String code, String message, String description) {
     super(message);
-    this.httpStatus =
-        HttpStatus.BAD_REQUEST; // Default para BAD_REQUEST (pode ser ajustado se necessário)
+    this.httpStatus = HttpStatus.BAD_REQUEST;
     this.code = code;
     this.title = "Erro ao comunicar com Altair";
     this.message = message;

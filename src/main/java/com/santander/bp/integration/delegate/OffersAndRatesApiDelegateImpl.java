@@ -64,7 +64,7 @@ public class OffersAndRatesApiDelegateImpl implements OffersAndRatesApiDelegate 
       if (cosmosOffers.isEmpty()) {
         Errors errorResponse =
             ErrorBuilderUtil.buildNotFoundError(
-                "No offers were found with the specified criteria in CosmosDB");
+                "Nenhuma oferta foi encontrada com os critérios especificados no CosmosDB");
         future.complete(
             ResponseBuilderUtil.buildErrorResponse(errorResponse, HttpStatus.NOT_FOUND));
       } else {
@@ -88,8 +88,8 @@ public class OffersAndRatesApiDelegateImpl implements OffersAndRatesApiDelegate 
         Errors errorResponse =
             ErrorBuilderUtil.buildError(
                 "NOT_FOUND",
-                "No offers found",
-                "No offers were found for the given criteria.",
+                "Nenhuma oferta encontrada",
+                "Nenhuma oferta foi encontrada para os parametros fornecidos",
                 LevelEnum.INFO);
         future.complete(
             ResponseBuilderUtil.buildErrorResponse(errorResponse, HttpStatus.NOT_FOUND));

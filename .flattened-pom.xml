@@ -9,7 +9,7 @@
   </parent>
   <groupId>com.santander.bp</groupId>
   <artifactId>ars-pricing-tax-v1</artifactId>
-  <version>0.1.0-SNAPSHOT</version>
+  <version>0.1.5</version>
   <name>AppArsenal Microservice Arsenal Back-End</name>
   <description>Arsenal Back-End Microservice - Generated to AppArsenal</description>
   <organization>
