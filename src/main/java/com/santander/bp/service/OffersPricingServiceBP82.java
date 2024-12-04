@@ -27,20 +27,24 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class OffersPricingServiceBP82 {
 
-    @Autowired private OffersMapperBP82 offersMapperBP82;
+    @Autowired
+    private OffersMapperBP82 offersMapperBP82;
 
-    @Autowired private ArsenalAltairConfig arsenalAltairConfig;
+    @Autowired
+    private ArsenalAltairConfig arsenalAltairConfig;
 
-    @Autowired private AltairStrategy altairStrategy;
+    @Autowired
+    private AltairStrategy altairStrategy;
 
-    @Autowired private AltairFacade altairFacade;
+    @Autowired
+    private AltairFacade altairFacade;
 
     public List<OffersPricingResponse> processOffers(OffersPricingRequest offersPricingRequest)
-        throws AltairException {
+            throws AltairException {
 
         log.info(
-            "Iniciando o mapeamento da requisição para BPMP82. Dados recebidos: {}",
-            offersPricingRequest);
+                "Iniciando o mapeamento da requisição para BPMP82. Dados recebidos: {}",
+                offersPricingRequest);
 
         List<OffersPricingResponse> responseList = new ArrayList<>();
         boolean recall;
@@ -63,53 +67,48 @@ public class OffersPricingServiceBP82 {
     }
 
     private boolean shouldRecall(ResponseDto altairReturn, OffersPricingRequest offersPricingRequest) {
-        if (!altairReturn.getObjeto().getListaFormatos().isEmpty()) {
-            var lastFormat =
-                altairReturn
-                    .getObjeto()
-                    .getListaFormatos()
-                    .get(altairReturn.getObjeto().getListaFormatos().size() - 1);
-
-            if (lastFormat instanceof PsScreen psScreen && psScreen.getFormato() instanceof BPMP82 bpmp82Response) {
-
-                String indicatorRecall = bpmp82Response.getINDREA();
-                if (FixedFieldsEnum.RECALL_INDICATOR.getValue().equals(indicatorRecall)) {
-                    offersPricingRequest.setIndicatorRecall(bpmp82Response.getINDREA());
-                    offersPricingRequest.setCdRecall(bpmp82Response.getPRODREA());
-                    offersPricingRequest.setSubProductRecall(bpmp82Response.getSUBPREA());
-
-                    return true;
-                }
-            }
+        if (altairReturn.getObjeto().getListaFormatos().isEmpty()) {
+            return false;
         }
+
+        var lastFormat = altairReturn.getObjeto().getListaFormatos()
+                .get(altairReturn.getObjeto().getListaFormatos().size() - 1);
+
+        if (!(lastFormat instanceof PsScreen psScreen)) {
+            return false;
+        }
+
+        if (!(psScreen.getFormato() instanceof BPMP82 bpmp82Response)) {
+            return false;
+        }
+
+        String indicatorRecall = bpmp82Response.getINDREA();
+        if (FixedFieldsEnum.RECALL_INDICATOR.getValue().equals(indicatorRecall)) {
+            offersPricingRequest.setIndicatorRecall(bpmp82Response.getINDREA());
+            offersPricingRequest.setCdRecall(bpmp82Response.getPRODREA());
+            offersPricingRequest.setSubProductRecall(bpmp82Response.getSUBPREA());
+            return true;
+        }
+
         return false;
     }
 
     private void handleErrors(ResponseDto responseDto) {
-        if (responseDto.getObjeto().getListaErros() != null
-            && !responseDto.getObjeto().getListaErros().isEmpty()) {
+        if (responseDto.getObjeto().getListaErros() != null && !responseDto.getObjeto().getListaErros().isEmpty()) {
             log.warn("Erro retornado pela alta plataforma.");
-            responseDto
-                .getObjeto()
-                .getListaErros()
-                .forEach(
-                    erro -> {
-                        if (erro instanceof PsError psError) {
-                            log.warn(
-                                "Código do Erro: {}, Mensagem do Erro: {}",
-                                psError.getCodigo(),
-                                psError.getMensagem());
-                        }
-                    });
-            throw new AltairException(
-                "ERRO_ALTAPLATAFORMA", "Erro na transação", "Detalhes dos erros encontrados");
+            responseDto.getObjeto().getListaErros().forEach(erro -> {
+                if (erro instanceof PsError psError) {
+                    log.warn("Código do Erro: {}, Mensagem do Erro: {}", psError.getCodigo(), psError.getMensagem());
+                }
+            });
+            throw new AltairException("ERRO_ALTAPLATAFORMA", "Erro na transação", "Detalhes dos erros encontrados");
         }
     }
 
     private ResponseDto sendMessageAltair(Transaction transaction, Object dados) {
         try {
             log.info(
-                "Iniciando envio para Altair MQ. Transação: {}, Dados: {}", transaction.name(), dados);
+                    "Iniciando envio para Altair MQ. Transação: {}, Dados: {}", transaction.name(), dados);
 
             configurarArsenalConfig(transaction);
             altairFacade = altairStrategy.getAltairFacade(arsenalAltairConfig, dados);
@@ -124,13 +123,13 @@ public class OffersPricingServiceBP82 {
 
         } catch (Exception e) {
             log.error(
-                "Erro ao enviar mensagem para Altair MQ. Transação: {}, Dados: {}, Erro: {}",
-                transaction.name(),
-                dados,
-                e.getMessage(),
-                e);
+                    "Erro ao enviar mensagem para Altair MQ. Transação: {}, Dados: {}, Erro: {}",
+                    transaction.name(),
+                    dados,
+                    e.getMessage(),
+                    e);
             throw new AltairException(
-                "MQ_ERROR", e.getMessage(), "Erro ao enviar mensagem para o Altair MQ");
+                    "MQ_ERROR", e.getMessage(), "Erro ao enviar mensagem para o Altair MQ");
         }
     }
 
