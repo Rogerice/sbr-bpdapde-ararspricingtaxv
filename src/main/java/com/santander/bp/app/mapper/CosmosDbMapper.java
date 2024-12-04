@@ -6,8 +6,10 @@ import com.santander.bp.model.SubProductCosmosDTO;
 import com.santander.bp.model.SubProductDetails;
 import java.util.List;
 import java.util.stream.Collectors;
+import lombok.Generated;
 import org.springframework.stereotype.Component;
 
+@Generated
 @Component
 public class CosmosDbMapper {
 

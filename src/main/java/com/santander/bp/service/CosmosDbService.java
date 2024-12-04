@@ -6,11 +6,13 @@ import com.santander.bp.model.OffersPricingResponse;
 import com.santander.bp.repository.OffersCosmosDbRepository;
 import java.util.List;
 import java.util.stream.Collectors;
+import lombok.Generated;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+@Generated
 @Service
 public class CosmosDbService {
 

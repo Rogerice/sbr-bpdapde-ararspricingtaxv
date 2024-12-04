@@ -1,8 +1,10 @@
 package com.santander.bp.service.whitelist;
 
 import com.santander.bp.repository.WhitelistRepository;
+import lombok.Generated;
 import org.springframework.stereotype.Service;
 
+@Generated
 @Service
 public class WhitelistService {
 

@@ -4,7 +4,9 @@ import com.santander.bp.model.Error;
 import com.santander.bp.model.Error.LevelEnum;
 import com.santander.bp.model.Errors;
 import java.util.Collections;
+import lombok.Generated;
 
+@Generated
 public class ErrorBuilderUtil {
 
   public static Errors buildError(

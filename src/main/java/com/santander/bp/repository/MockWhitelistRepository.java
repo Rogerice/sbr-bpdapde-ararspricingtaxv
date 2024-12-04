@@ -4,8 +4,10 @@ import com.santander.bp.model.WhitelistEntryDTO;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import lombok.Generated;
 import org.springframework.stereotype.Repository;
 
+@Generated
 @Repository
 public class MockWhitelistRepository implements WhitelistRepository {
 

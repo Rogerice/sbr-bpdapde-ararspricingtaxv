@@ -2,7 +2,9 @@ package com.santander.bp.repository;
 
 import com.santander.bp.model.WhitelistEntryDTO;
 import java.util.Optional;
+import lombok.Generated;
 
+@Generated
 public interface WhitelistRepository {
 
   /**

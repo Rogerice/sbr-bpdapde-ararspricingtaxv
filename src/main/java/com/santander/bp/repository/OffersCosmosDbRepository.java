@@ -5,8 +5,10 @@ import com.azure.spring.data.cosmos.repository.Query;
 import com.santander.bp.model.OfferCosmosDTO;
 import feign.Param;
 import java.util.List;
+import lombok.Generated;
 import org.springframework.stereotype.Repository;
 
+@Generated
 @Repository
 public interface OffersCosmosDbRepository extends CosmosRepository<OfferCosmosDTO, String> {
 

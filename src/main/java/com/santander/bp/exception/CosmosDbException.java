@@ -1,5 +1,8 @@
 package com.santander.bp.exception;
 
+import lombok.Generated;
+
+@Generated
 public class CosmosDbException extends RuntimeException {
   private final String code;
   private final String description;

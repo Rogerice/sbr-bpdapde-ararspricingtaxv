@@ -4,9 +4,11 @@ import com.santander.bp.model.Errors;
 import com.santander.bp.model.OffersPricingResponse;
 import com.santander.bp.model.ResponseWrapper;
 import java.util.List;
+import lombok.Generated;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+@Generated
 public class ResponseBuilderUtil {
 
   public static ResponseEntity<ResponseWrapper> buildSuccessResponse(
