@@ -10,8 +10,10 @@ import com.santander.bp.exception.AltairException;
 import com.santander.bp.model.OffersPricingRequest;
 import com.santander.bp.model.altair.BPMP82;
 
+import lombok.Generated;
 import lombok.extern.slf4j.Slf4j;
 
+@Generated
 @Slf4j
 public final class ResponseHandler {
 
