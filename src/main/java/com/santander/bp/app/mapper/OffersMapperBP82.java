@@ -57,7 +57,6 @@ public class OffersMapperBP82 {
                     BPMP820 bpmp820 = (BPMP820) psScreen.getFormato();
                     OffersPricingResponse offersPricingResponse =
                         construirOffersPricingResponse(bpmp820);
-                    log.info("OffersPricingResponse criado: {}", offersPricingResponse);
                     offersResponseList.add(offersPricingResponse);
                   }
                 }

@@ -5,7 +5,8 @@ import lombok.Generated;
 @Generated
 public enum FixedFieldsEnum {
   BANCO("0033"),
-  PRODUTO("26");
+  PRODUTO("26"),
+  RECALL_INDICATOR("S");
 
   private final String value;
 

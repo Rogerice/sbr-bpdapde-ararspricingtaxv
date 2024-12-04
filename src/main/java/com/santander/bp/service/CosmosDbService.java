@@ -32,7 +32,7 @@ public class CosmosDbService {
 
   private void logOfferSearch(String cdSegm, String channelCode, String product) {
     logger.info(
-        "Searching offers, segment: {}, channel: {}, product: {}", cdSegm, channelCode, product);
+        "Procurando ofertas, segment: {}, channel: {}, product: {}", cdSegm, channelCode, product);
   }
 
   private List<OfferCosmosDTO> findOffers(String cdSegm, String channelCode, String product) {

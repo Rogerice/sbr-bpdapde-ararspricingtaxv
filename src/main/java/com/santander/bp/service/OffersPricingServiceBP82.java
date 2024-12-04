@@ -5,7 +5,9 @@ import br.com.santander.ars.altair.core.facade.AltairFacade;
 import br.com.santander.ars.altair.core.facade.AltairStrategy;
 import com.altec.bsbr.fw.altair.dto.ResponseDto;
 import com.altec.bsbr.fw.ps.parser.object.PsError;
+import com.altec.bsbr.fw.ps.parser.object.PsScreen;
 import com.santander.bp.app.mapper.OffersMapperBP82;
+import com.santander.bp.enums.FixedFieldsEnum;
 import com.santander.bp.exception.AltairException;
 import com.santander.bp.factory.Transaction;
 import com.santander.bp.model.OffersPricingRequest;
@@ -13,6 +15,7 @@ import com.santander.bp.model.OffersPricingResponse;
 import com.santander.bp.model.altair.BPMP82;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.Generated;
 import lombok.extern.slf4j.Slf4j;
@@ -38,18 +41,58 @@ public class OffersPricingServiceBP82 {
     log.info(
         "Iniciando o mapeamento da requisição para BPMP82. Dados recebidos: {}",
         offersPricingRequest);
-    BPMP82 bpmp82 = offersMapperBP82.mapOffersRequest(offersPricingRequest);
-    log.info("Dados mapeados para BPMP82: {}", bpmp82);
 
-    ResponseDto altairReturn = sendMessageAltair(Transaction.BP82, bpmp82);
-    log.info("Resposta do Altair recebida: {}", altairReturn);
+    List<OffersPricingResponse> responseList = new ArrayList<>();
+    boolean recall;
 
-    handleErrors(altairReturn);
+    do {
+      BPMP82 bpmp82 = offersMapperBP82.mapOffersRequest(offersPricingRequest);
+      log.info("Dados mapeados para BPMP82: {}", bpmp82);
 
-    List<OffersPricingResponse> responseList = offersMapperBP82.mapOffersResponseList(altairReturn);
+      ResponseDto altairReturn = sendMessageAltair(Transaction.BP82, bpmp82);
+      log.info("Resposta do Altair recebida: {}", altairReturn);
 
-    log.info("Lista completa de respostas mapeadas para OffersPricingResponse: {}", responseList);
+      handleErrors(altairReturn);
+      responseList.addAll(offersMapperBP82.mapOffersResponseList(altairReturn));
+
+      recall = shouldRecall(altairReturn, offersPricingRequest);
+
+    } while (recall);
+
     return responseList;
+  }
+
+  private boolean shouldRecall(
+      ResponseDto altairReturn, OffersPricingRequest offersPricingRequest) {
+    if (!altairReturn.getObjeto().getListaFormatos().isEmpty()) {
+      var lastFormat =
+          altairReturn
+              .getObjeto()
+              .getListaFormatos()
+              .get(altairReturn.getObjeto().getListaFormatos().size() - 1);
+
+      // Primeiro verificamos se o lastFormat é do tipo PsScreen
+      if (lastFormat instanceof PsScreen) {
+        PsScreen psScreen = (PsScreen) lastFormat;
+
+        // Depois verificamos se o formato do PsScreen é do tipo BPMP82
+        if (psScreen.getFormato() instanceof BPMP82) {
+          BPMP82 bpmp82Response = (BPMP82) psScreen.getFormato();
+
+          // Validação do valor "S" utilizando o enum
+          String indicatorRecall = bpmp82Response.getINDREA();
+          if (FixedFieldsEnum.RECALL_INDICATOR.getValue().equals(indicatorRecall)) {
+            // Atualiza o request com os dados para a próxima iteração
+            offersPricingRequest.setIndicatorRecall(bpmp82Response.getINDREA());
+            offersPricingRequest.setCdRecall(bpmp82Response.getPRODREA());
+            offersPricingRequest.setSubProductRecall(bpmp82Response.getSUBPREA());
+
+            return true;
+          }
+        }
+      }
+    }
+    return false;
   }
 
   private void handleErrors(ResponseDto responseDto) {
