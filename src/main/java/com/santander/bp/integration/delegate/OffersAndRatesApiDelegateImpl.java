@@ -7,8 +7,8 @@ import com.santander.bp.model.Errors;
 import com.santander.bp.model.OffersPricingRequest;
 import com.santander.bp.model.OffersPricingResponse;
 import com.santander.bp.model.ResponseWrapper;
-import com.santander.bp.service.CosmosDbService;
 import com.santander.bp.service.OffersPricingServiceBP82;
+import com.santander.bp.service.OffersService;
 import com.santander.bp.service.whitelist.WhitelistService;
 import com.santander.bp.util.ErrorBuilderUtil;
 import com.santander.bp.util.ResponseBuilderUtil;
@@ -28,7 +28,7 @@ public class OffersAndRatesApiDelegateImpl implements OffersAndRatesApiDelegate 
 
   @Autowired private OffersPricingServiceBP82 offersPricingServiceBP82;
 
-  @Autowired private CosmosDbService cosmosDbService;
+  @Autowired private OffersService offersService; // Substituindo CosmosDbService pelo OffersService
 
   @Autowired private WhitelistService whitelistService;
 
@@ -62,8 +62,9 @@ public class OffersAndRatesApiDelegateImpl implements OffersAndRatesApiDelegate 
       OffersPricingRequest offersPricingRequest,
       CompletableFuture<ResponseEntity<ResponseWrapper>> future) {
     try {
+      // Alterado para usar OffersService ao invés de CosmosDbService diretamente
       List<OffersPricingResponse> cosmosOffers =
-          cosmosDbService.getOffers(
+          offersService.getOffers(
               offersPricingRequest.getSegment(), offersPricingRequest.getChannel(), "26");
 
       if (cosmosOffers.isEmpty()) {

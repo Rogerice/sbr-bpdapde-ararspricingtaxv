@@ -12,6 +12,7 @@ import com.santander.bp.model.OffersPricingResponse;
 import com.santander.bp.model.ResponseWrapper;
 import com.santander.bp.service.CosmosDbService;
 import com.santander.bp.service.OffersPricingServiceBP82;
+import com.santander.bp.service.OffersService;
 import com.santander.bp.service.whitelist.WhitelistService;
 import java.util.Collections;
 import java.util.List;
@@ -31,6 +32,8 @@ class OffersAndRatesApiDelegateImplTest {
 
   @Mock private WhitelistService whitelistService;
 
+  @Mock private OffersService offersService;
+
   @InjectMocks private OffersAndRatesApiDelegateImpl offersAndRatesApiDelegate;
 
   @BeforeEach
@@ -38,6 +41,7 @@ class OffersAndRatesApiDelegateImplTest {
     MockitoAnnotations.openMocks(this);
   }
 
+  @SuppressWarnings("deprecation")
   @Test
   void testOffersPost_ClientInWhitelist_NoOffersFound() {
     OffersPricingRequest request = new OffersPricingRequest();
@@ -48,7 +52,7 @@ class OffersAndRatesApiDelegateImplTest {
     request.setDocumentType("CPF");
 
     when(whitelistService.isInWhitelist(any(), any())).thenReturn(true);
-    when(cosmosDbService.getOffers(any(), any(), any())).thenReturn(Collections.emptyList());
+    when(offersService.getOffers(any(), any(), any())).thenReturn(Collections.emptyList());
 
     CompletableFuture<ResponseEntity<ResponseWrapper>> responseFuture =
         offersAndRatesApiDelegate.offersPost(request);
@@ -62,6 +66,7 @@ class OffersAndRatesApiDelegateImplTest {
     assertEquals("No offers found", errors.getMessage());
   }
 
+  @SuppressWarnings("deprecation")
   @Test
   void testOffersPost_ClientInWhitelist_OffersFound() {
     OffersPricingRequest request = new OffersPricingRequest();
@@ -74,7 +79,7 @@ class OffersAndRatesApiDelegateImplTest {
     OffersPricingResponse offer = new OffersPricingResponse();
     offer.setId("offer-1");
     when(whitelistService.isInWhitelist(any(), any())).thenReturn(true);
-    when(cosmosDbService.getOffers(any(), any(), any())).thenReturn(List.of(offer));
+    when(offersService.getOffers(any(), any(), any())).thenReturn(List.of(offer));
 
     CompletableFuture<ResponseEntity<ResponseWrapper>> responseFuture =
         offersAndRatesApiDelegate.offersPost(request);
@@ -86,6 +91,7 @@ class OffersAndRatesApiDelegateImplTest {
     assertTrue(response.getBody().getData().contains(offer));
   }
 
+  @SuppressWarnings("deprecation")
   @Test
   void testOffersPost_ClientNotInWhitelist_NoOffersFound() {
     OffersPricingRequest request = new OffersPricingRequest();
@@ -107,6 +113,6 @@ class OffersAndRatesApiDelegateImplTest {
     assertNotNull(response.getBody());
     Error errors = response.getBody().getErrors().get(0);
     assertEquals("NOT_FOUND", errors.getCode());
-    // assertEquals("No offers found", errors.getMessage());
+    assertEquals("Nenhuma oferta encontrada", errors.getMessage());
   }
 }

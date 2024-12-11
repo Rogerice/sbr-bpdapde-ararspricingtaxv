@@ -111,6 +111,13 @@ resilience4j:
     instances:
       appArsenalController:
         timeoutDuration: 2s
+  circuitbreaker:
+    instances:
+      myNewService:
+        sliding-window-size: 20
+        minimum-number-of-calls: 10
+        failure-rate-threshold: 30
+        wait-duration-in-open-state: 5000ms
 
 # Health default configurations
 management:
