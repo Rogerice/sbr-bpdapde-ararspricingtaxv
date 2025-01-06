@@ -11,7 +11,7 @@ public class RestApiException extends RuntimeException {
   private final String code;
   private final String title;
   private final String message;
-  private final transient Object details;
+  private transient Object details; // Removido o final para permitir que o campo seja transient
 
   public RestApiException(AppError appError) {
     super(appError.getMessage());
@@ -59,5 +59,9 @@ public class RestApiException extends RuntimeException {
 
   public Object getDetails() {
     return details;
+  }
+
+  public void setDetails(Object details) {
+    this.details = details; // Adicionado método setter para permitir alterações no campo transient
   }
 }
