@@ -1,5 +1,20 @@
-# Spring Boot application properties
 spring:
+  aop:
+    proxy-target-class: false
+
+  datasource:
+    url: jdbc:postgresql://sbrd1zb1apfbp0brscomm001.postgres.database.azure.com:5432/pgds333?sslmode=require
+    username: svc_d_bp_01
+    password: "hp?1k3AS6Cj@S?@3"
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    show-sql: false
+    properties:
+      hibernate.use_sql_comments: true
+      hibernate.format_sql: false
+    hibernate:
+      ddl-auto: none  # 'validate'
+
   main:
     banner-mode: 'console'
   application:
@@ -14,7 +29,6 @@ spring:
         jwt:
           jwk-set-uri: ${HOST_RHSSO}/auth/realms/${RHSSO_REALM}/protocol/openid-connect/certs
 
-# Dados exibidos no endpoint "info" do Actuator
 info:
   app:
     groupId: "com.santander.ars"
@@ -22,21 +36,21 @@ info:
     version: "3.10.0"
     java.version: "17.0.7"
 
-# server port
 server:
   port: 8080
   servlet:
     encoding:
       charset: UTF-8
     context-path: /ars-pricing-tax-v1
+
 azure:
   cosmos:
     uri: ${DATABASE_URL:https://sbrd1zb1cdbbp0brscomm002.documents.azure.com:443/}
     key: ${DATABASE_KEY:rN3Biqi2aRXf8g50RswQzpYpJWQE51295bQe1kn4MVBYgKhCnLN06HFl3SZnPtX49wnKzZiVVlTHACDbY21hlg==}
     database: ${DATABASE_NAME:bp}
     connectionType: ${CONNECTION_TYPE:KEY}
-    queryMetricsEnabled: false      
-# Arsenal core library settings
+    queryMetricsEnabled: false
+
 arsenal:
   library:
     altair:
@@ -60,38 +74,16 @@ arsenal:
         pwd: password
     core:
       api:
-        enable-docs: true # Desativar documentação Swagger/OpenAPI
-        docs-base-package: com.santander.gt.ngt.controller # Package where the controller classes are located
+        enable-docs: true
+        docs-base-package: com.santander.gt.ngt.controller
         archetypekey: ####415253454E414C####
-  logging:
-    console-log: true
-    dev-mode: true
-#    kafka:
-#        servers: localhost:9092
-#        topic: logs
-#        keystore:
-#            location: /tmp/keystore
-#            password: xpto
-#        truststore:
-#            location: /tmp/truststore
-#            password: xpto
-    isGluon: false # If the isGluon field is true, you must set the following parameters:
-#    company: # Santander company whose component is generating the logs.
-#    componentName: # Name of the component that generates the log.
-#    componentId: # Identifier of the component that generates the log.
-#    componentType: # The type of the Gluon component (e.g., microservice, API...)
-#    appName: # The technical application name
-#    appId: # Identifier of the application of the component that generates the log.
 
-# Sobrescrevendo grupos e níveis de log
 logging:
-  group:
-    web: org.springframework.core.codec, org.springframework.http, org.springframework.web
-    spring: org.springframework.core.env
-    servlet: org.springframework.boot.web, org.apache.catalina, org.apache.coyote, org.apache.tomcat
-    data: org.springframework.jdbc.core, org.hibernate.sql, org.springframework.orm.jpa, com.zaxxer.hikari, org.hibernate, org.jooq.tools.LoggerListener
-    app: com.santander.bp
   level:
+    org.springframework: DEBUG
+    com.altec: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
     root: WARN
     spring: INFO
     app: INFO
@@ -99,7 +91,6 @@ logging:
     web: WARN
     data: INFO
 
-# Resilience4j settings
 resilience4j:
   ratelimiter:
     instances:
@@ -119,7 +110,6 @@ resilience4j:
         failure-rate-threshold: 30
         wait-duration-in-open-state: 5000ms
 
-# Health default configurations
 management:
   endpoint:
     health:
@@ -132,7 +122,6 @@ management:
     readinessState:
       enabled: true
 
-# Cucumber settings
 cucumber:
   publish:
     quiet: true

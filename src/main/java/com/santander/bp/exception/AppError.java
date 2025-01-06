@@ -7,16 +7,16 @@ import org.springframework.http.HttpStatus;
 @Generated
 @Getter
 public enum AppError {
-  NOT_FOUND("171", HttpStatus.NOT_FOUND, "Cosmos", "Erro lista de erro retorno Cosmos", null),
+  NOT_FOUND("400", HttpStatus.NOT_FOUND, "Cosmos", "Erro lista de erro retorno Cosmos", null),
 
   ALTAIR_ERROR(
-      "157",
+      "400",
       HttpStatus.INTERNAL_SERVER_ERROR,
       "Erro de comunicação Altair",
       "Ocorreu um erro durante a comunicação com Altair",
       null),
 
-  NOT_WHITELISTED("180", HttpStatus.INTERNAL_SERVER_ERROR, "White LIST", "ERROR", null);
+  NOT_WHITELISTED("400", HttpStatus.INTERNAL_SERVER_ERROR, "White LIST", "ERROR", null);
 
   private final String code;
   private final HttpStatus httpStatus;
