@@ -20,14 +20,11 @@ public class OffersServiceTest {
 
   @Test
   void whenCosmosServiceFails_thenFallbackIsCalled() {
-    // Simula uma exceção ao chamar o serviço CosmosDb
     Mockito.when(cosmosDbService.getOffers(anyString(), anyString(), anyString()))
         .thenThrow(new RuntimeException("Service Unavailable"));
 
-    // Chama o método getOffers e verifica se o fallback é acionado
     List<OffersPricingResponse> response = offersService.getOffers("segment", "channel", "product");
 
-    // O fallback retorna uma lista vazia
     assertThat(response).isEmpty();
   }
 }
