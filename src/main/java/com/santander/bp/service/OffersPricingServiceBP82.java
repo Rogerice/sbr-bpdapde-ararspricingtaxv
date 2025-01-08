@@ -81,7 +81,7 @@ public class OffersPricingServiceBP82 {
           e.getMessage(),
           e);
       throw new AltairException(
-          "MQ_ERROR", e.getMessage(), "Erro ao enviar mensagem para o Altair MQ");
+          "MQ_ERROR", e.getMessage(), "Erro ao enviar mensagem para o Altair MQ", e);
     }
   }
 

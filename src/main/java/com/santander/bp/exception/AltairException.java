@@ -13,6 +13,12 @@ public class AltairException extends RuntimeException {
     this.description = description;
   }
 
+  public AltairException(String code, String message, String description, Throwable cause) {
+    super(message, cause);
+    this.code = code;
+    this.description = description;
+  }
+
   public String getCode() {
     return code;
   }
