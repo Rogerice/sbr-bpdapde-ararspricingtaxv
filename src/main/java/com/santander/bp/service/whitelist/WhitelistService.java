@@ -1,14 +1,17 @@
 package com.santander.bp.service.whitelist;
 
-import com.santander.bp.entity.WhitelistEntity;
 import com.santander.bp.model.WhitelistDTO;
 import com.santander.bp.repository.WhitelistJpaRepository;
 import java.util.List;
-import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class WhitelistService {
+
+  private static final Logger logger = LoggerFactory.getLogger(WhitelistService.class);
 
   private final WhitelistJpaRepository whitelistJpaRepository;
 
@@ -24,10 +27,20 @@ public class WhitelistService {
    * @return true se houver pelo menos um registro na whitelist para o documento; false caso
    *     contrário.
    */
+  @Transactional(readOnly = true)
   public boolean isInWhitelist(String documentType, String documentNumber) {
-    List<WhitelistEntity> results =
-        whitelistJpaRepository.findByDocumentTypeAndDocumentNumber(documentType, documentNumber);
-    return !results.isEmpty(); // Retorna true se houver ao menos um resultado
+    try {
+      return !whitelistJpaRepository
+          .findByDocumentTypeAndDocumentNumber(documentType, documentNumber)
+          .isEmpty();
+    } catch (Exception e) {
+      logger.error(
+          "Erro ao verificar se o documento está na whitelist: {}-{}",
+          documentType,
+          documentNumber,
+          e);
+      return false;
+    }
   }
 
   /**
@@ -36,9 +49,14 @@ public class WhitelistService {
    * @param agencia Código da agência.
    * @return true se a agência estiver na whitelist; false caso contrário.
    */
+  @Transactional(readOnly = true)
   public boolean isAgencyInWhitelist(String agencia) {
-    List<WhitelistEntity> results = whitelistJpaRepository.findByAgencia(agencia);
-    return !results.isEmpty(); // Retorna true se houver ao menos um resultado
+    try {
+      return !whitelistJpaRepository.findByAgencia(agencia).isEmpty();
+    } catch (Exception e) {
+      logger.error("Erro ao verificar se a agência está na whitelist: {}", agencia, e);
+      return false;
+    }
   }
 
   /**
@@ -48,18 +66,27 @@ public class WhitelistService {
    * @param documentNumber Número do documento.
    * @return Uma lista de objetos WhitelistDTO.
    */
+  @Transactional(readOnly = true)
   public List<WhitelistDTO> getWhitelistDetails(String documentType, String documentNumber) {
-    List<WhitelistEntity> entities =
-        whitelistJpaRepository.findByDocumentTypeAndDocumentNumber(documentType, documentNumber);
-    return entities.stream()
-        .map(
-            entity ->
-                new WhitelistDTO(
-                    entity.getId() != null ? entity.getId().longValue() : null,
-                    entity.getDocumentType(),
-                    entity.getDocumentNumber(),
-                    entity.getAgencia()))
-        .collect(Collectors.toList());
+    try {
+      return whitelistJpaRepository
+          .findByDocumentTypeAndDocumentNumber(documentType, documentNumber).stream()
+          .map(
+              entity ->
+                  new WhitelistDTO(
+                      entity.getId() != null ? entity.getId().longValue() : null,
+                      entity.getDocumentType(),
+                      entity.getDocumentNumber(),
+                      entity.getAgencia()))
+          .toList();
+    } catch (Exception e) {
+      logger.error(
+          "Erro ao obter os detalhes da whitelist para documento: {}-{}",
+          documentType,
+          documentNumber,
+          e);
+      return List.of();
+    }
   }
 
   /**
@@ -68,16 +95,21 @@ public class WhitelistService {
    * @param agencia Código da agência.
    * @return Uma lista de objetos WhitelistDTO.
    */
+  @Transactional(readOnly = true)
   public List<WhitelistDTO> getWhitelistDetailsByAgency(String agencia) {
-    List<WhitelistEntity> entities = whitelistJpaRepository.findByAgencia(agencia);
-    return entities.stream()
-        .map(
-            entity ->
-                new WhitelistDTO(
-                    entity.getId() != null ? entity.getId().longValue() : null,
-                    entity.getDocumentType(),
-                    entity.getDocumentNumber(),
-                    entity.getAgencia()))
-        .collect(Collectors.toList());
+    try {
+      return whitelistJpaRepository.findByAgencia(agencia).stream()
+          .map(
+              entity ->
+                  new WhitelistDTO(
+                      entity.getId() != null ? entity.getId().longValue() : null,
+                      entity.getDocumentType(),
+                      entity.getDocumentNumber(),
+                      entity.getAgencia()))
+          .toList();
+    } catch (Exception e) {
+      logger.error("Erro ao obter os detalhes da whitelist para a agência: {}", agencia, e);
+      return List.of();
+    }
   }
 }

@@ -14,7 +14,7 @@ public class WhitelistEntity {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Integer id;
+  private Long id;
 
   @Column(name = "document_type", nullable = false, length = 10)
   private String documentType;
