@@ -41,18 +41,29 @@ public class OffersAndRatesApiDelegateImpl implements OffersAndRatesApiDelegate 
     CompletableFuture<ResponseEntity<ResponseWrapper>> future = new CompletableFuture<>();
 
     try {
-      if (isClientInWhitelist(offersPricingRequest)) {
+      // Validação de CPF/CNPJ e agência na whitelist
+      boolean isDocumentInWhitelist =
+          whitelistService.isInWhitelist(
+              offersPricingRequest.getDocumentType(), offersPricingRequest.getDocumentNumber());
+
+      boolean isAgencyInWhitelist =
+          !isDocumentInWhitelist
+              && whitelistService.isAgencyInWhitelist(offersPricingRequest.getCenterId());
+
+      if (isDocumentInWhitelist || isAgencyInWhitelist) {
         log.info(
-            "Cliente com documentType: {}, documentNumber: {} está na whitelist.",
+            "Cliente está na whitelist. DocumentType: {}, DocumentNumber: {}, CenterId: {}",
             offersPricingRequest.getDocumentType(),
-            offersPricingRequest.getDocumentNumber());
+            offersPricingRequest.getDocumentNumber(),
+            offersPricingRequest.getCenterId());
 
         processWhitelistOffers(offersPricingRequest, future);
       } else {
         log.info(
-            "Cliente com documentType: {}, documentNumber: {} não está na whitelist. Processando pelo fluxo principal.",
+            "Cliente não está na whitelist. Processando pelo fluxo principal. DocumentType: {}, DocumentNumber: {}, CenterId: {}",
             offersPricingRequest.getDocumentType(),
-            offersPricingRequest.getDocumentNumber());
+            offersPricingRequest.getDocumentNumber(),
+            offersPricingRequest.getCenterId());
 
         processNonWhitelistOffers(offersPricingRequest, future);
       }
@@ -129,22 +140,6 @@ public class OffersAndRatesApiDelegateImpl implements OffersAndRatesApiDelegate 
           e);
       handleUnexpectedException(e, future);
     }
-  }
-
-  private boolean isClientInWhitelist(OffersPricingRequest offersPricingRequest) {
-    log.debug(
-        "Verificando se o cliente está na whitelist. DocumentType: {}, DocumentNumber: {}, CenterId: {}",
-        offersPricingRequest.getDocumentType(),
-        offersPricingRequest.getDocumentNumber(),
-        offersPricingRequest.getCenterId());
-
-    boolean isInWhitelist =
-        whitelistService.isInWhitelist(
-                offersPricingRequest.getDocumentType(), offersPricingRequest.getDocumentNumber())
-            || whitelistService.isAgencyInWhitelist(offersPricingRequest.getCenterId());
-
-    log.debug("Resultado da verificação de whitelist: {}", isInWhitelist);
-    return isInWhitelist;
   }
 
   private void handleRestApiException(

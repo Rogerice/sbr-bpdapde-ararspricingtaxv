@@ -52,7 +52,13 @@ public class WhitelistService {
     List<WhitelistEntity> entities =
         whitelistJpaRepository.findByDocumentTypeAndDocumentNumber(documentType, documentNumber);
     return entities.stream()
-        .map(entity -> new WhitelistDTO(entity.getDocumentNumber(), entity.getAgencia()))
+        .map(
+            entity ->
+                new WhitelistDTO(
+                    entity.getId() != null ? entity.getId().longValue() : null,
+                    entity.getDocumentType(),
+                    entity.getDocumentNumber(),
+                    entity.getAgencia()))
         .collect(Collectors.toList());
   }
 
@@ -65,7 +71,13 @@ public class WhitelistService {
   public List<WhitelistDTO> getWhitelistDetailsByAgency(String agencia) {
     List<WhitelistEntity> entities = whitelistJpaRepository.findByAgencia(agencia);
     return entities.stream()
-        .map(entity -> new WhitelistDTO(entity.getDocumentNumber(), entity.getAgencia()))
+        .map(
+            entity ->
+                new WhitelistDTO(
+                    entity.getId() != null ? entity.getId().longValue() : null,
+                    entity.getDocumentType(),
+                    entity.getDocumentNumber(),
+                    entity.getAgencia()))
         .collect(Collectors.toList());
   }
 }
