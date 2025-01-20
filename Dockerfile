@@ -4,7 +4,7 @@ ARG APP_PATH="/app"
 ########################
 # Maven & Dependencias #
 ########################
-FROM artifactory.santanderbr.corp/docker-base/rhel8/javase-17:1.18.1.RELEASE as dependencies
+FROM artifactory.santanderbr.corp/docker-base/rhel8/javase-17:1.19.0.RELEASE as dependencies
 
 ARG USER_HOME_DIR="/root"
 ARG SHA=707b1f6e390a65bde4af4cdaf2a24d45fc19a6ded00fff02e91626e3e42ceaff
@@ -58,7 +58,7 @@ RUN mvn compile test
 ###############
 ## APLICACAO ##
 ###############
-FROM artifactory.santanderbr.corp/docker-base/rhel8/javase-17:1.18.1.RELEASE
+FROM artifactory.santanderbr.corp/docker-base/rhel8/javase-17:1.19.0.RELEASE
 ARG APP_PATH
 ARG NAME
 ARG VERSION
