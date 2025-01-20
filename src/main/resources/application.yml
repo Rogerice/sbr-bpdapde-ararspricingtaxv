@@ -13,7 +13,7 @@ spring:
       hibernate.use_sql_comments: true
       hibernate.format_sql: false
     hibernate:
-      ddl-auto: none  # 'validate'
+      ddl-auto: validate  # Garantir validação sem alterar ou recriar tabelas
 
   main:
     banner-mode: 'console'
