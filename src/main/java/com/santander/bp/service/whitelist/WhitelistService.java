@@ -59,13 +59,6 @@ public class WhitelistService {
     }
   }
 
-  /**
-   * Obtém os detalhes da whitelist para um documento específico.
-   *
-   * @param documentType Tipo de documento (CPF ou CNPJ).
-   * @param documentNumber Número do documento.
-   * @return Uma lista de objetos WhitelistDTO.
-   */
   @Transactional(readOnly = true)
   public List<WhitelistDTO> getWhitelistDetails(String documentType, String documentNumber) {
     try {
@@ -74,7 +67,7 @@ public class WhitelistService {
           .map(
               entity ->
                   new WhitelistDTO(
-                      entity.getId() != null ? entity.getId().longValue() : null,
+                      entity.getId(), // Ajuste aqui
                       entity.getDocumentType(),
                       entity.getDocumentNumber(),
                       entity.getAgencia()))
@@ -89,12 +82,6 @@ public class WhitelistService {
     }
   }
 
-  /**
-   * Obtém os detalhes da whitelist para uma agência específica.
-   *
-   * @param agencia Código da agência.
-   * @return Uma lista de objetos WhitelistDTO.
-   */
   @Transactional(readOnly = true)
   public List<WhitelistDTO> getWhitelistDetailsByAgency(String agencia) {
     try {
@@ -102,7 +89,8 @@ public class WhitelistService {
           .map(
               entity ->
                   new WhitelistDTO(
-                      entity.getId() != null ? entity.getId().longValue() : null,
+                      entity.getId(), // Ajuste
+                      // aqui
                       entity.getDocumentType(),
                       entity.getDocumentNumber(),
                       entity.getAgencia()))
