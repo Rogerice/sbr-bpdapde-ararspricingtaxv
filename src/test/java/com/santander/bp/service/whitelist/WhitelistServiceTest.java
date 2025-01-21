@@ -146,43 +146,16 @@ class WhitelistServiceTest {
   }
 
   @Test
-  void testGetWhitelistDetailsByAgency_whenDataExists() {
-    String agencia = "001";
-    WhitelistEntity entity = new WhitelistEntity();
-    entity.setId(1L);
-    entity.setDocumentType("CPF");
-    entity.setDocumentNumber("12345678900");
-    entity.setAgencia(agencia);
+  void testGetWhitelistDetails_withNullResponseFromRepository() {
+    String documentType = "CPF";
+    String documentNumber = "12345678900";
+    when(whitelistJpaRepository.findByDocumentTypeAndDocumentNumber(documentType, documentNumber))
+        .thenReturn(null);
 
-    when(whitelistJpaRepository.findByAgencia(agencia)).thenReturn(List.of(entity));
+    List<WhitelistDTO> result = whitelistService.getWhitelistDetails(documentType, documentNumber);
 
-    List<WhitelistDTO> result = whitelistService.getWhitelistDetailsByAgency(agencia);
-
-    assertEquals(1, result.size(), "Expected one result when data exists");
-    assertEquals(agencia, result.get(0).getAgencia(), "Agency should match");
-    verify(whitelistJpaRepository, times(1)).findByAgencia(agencia);
-  }
-
-  @Test
-  void testGetWhitelistDetailsByAgency_whenNoDataExists() {
-    String agencia = "001";
-    when(whitelistJpaRepository.findByAgencia(agencia)).thenReturn(List.of());
-
-    List<WhitelistDTO> result = whitelistService.getWhitelistDetailsByAgency(agencia);
-
-    assertTrue(result.isEmpty(), "Expected empty list when no data exists");
-    verify(whitelistJpaRepository, times(1)).findByAgencia(agencia);
-  }
-
-  @Test
-  void testGetWhitelistDetailsByAgency_whenRepositoryThrowsException() {
-    String agencia = "001";
-    when(whitelistJpaRepository.findByAgencia(agencia))
-        .thenThrow(new RuntimeException("Database error"));
-
-    List<WhitelistDTO> result = whitelistService.getWhitelistDetailsByAgency(agencia);
-
-    assertTrue(result.isEmpty(), "Expected empty list when repository throws exception");
-    verify(whitelistJpaRepository, times(1)).findByAgencia(agencia);
+    assertTrue(result.isEmpty(), "Expected empty list when repository returns null");
+    verify(whitelistJpaRepository, times(1))
+        .findByDocumentTypeAndDocumentNumber(documentType, documentNumber);
   }
 }
