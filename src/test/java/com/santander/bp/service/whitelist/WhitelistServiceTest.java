@@ -24,7 +24,7 @@ class WhitelistServiceTest {
     MockitoAnnotations.openMocks(this);
   }
 
-  // Tests for isInWhitelist
+  // Teste para isInWhitelist
   @Test
   void testIsInWhitelist_whenDocumentExists() {
     String documentType = "CPF";
@@ -75,6 +75,7 @@ class WhitelistServiceTest {
     verify(whitelistJpaRepository, times(1)).findByDocumentTypeAndDocumentNumber(null, null);
   }
 
+  // Testes para isAgencyInWhitelist
   @Test
   void testIsAgencyInWhitelist_whenAgencyExists() {
     String agencia = "001";
@@ -109,6 +110,7 @@ class WhitelistServiceTest {
     verify(whitelistJpaRepository, times(1)).findByAgencia(agencia);
   }
 
+  // Testes para getWhitelistDetails
   @Test
   void testGetWhitelistDetails_whenDataExists() {
     String documentType = "CPF";
@@ -157,5 +159,58 @@ class WhitelistServiceTest {
     assertTrue(result.isEmpty(), "Expected empty list when repository returns null");
     verify(whitelistJpaRepository, times(1))
         .findByDocumentTypeAndDocumentNumber(documentType, documentNumber);
+  }
+
+  // Testes para getWhitelistDetailsByAgency
+  @Test
+  void testGetWhitelistDetailsByAgency_whenDataExists() {
+    String agencia = "001";
+    WhitelistEntity entity = new WhitelistEntity();
+    entity.setId(1L);
+    entity.setDocumentType("CPF");
+    entity.setDocumentNumber("12345678900");
+    entity.setAgencia(agencia);
+
+    when(whitelistJpaRepository.findByAgencia(agencia)).thenReturn(List.of(entity));
+
+    List<WhitelistDTO> result = whitelistService.getWhitelistDetailsByAgency(agencia);
+
+    assertEquals(1, result.size(), "Expected one result when data exists");
+    assertEquals(agencia, result.get(0).getAgencia(), "Agency should match");
+    verify(whitelistJpaRepository, times(1)).findByAgencia(agencia);
+  }
+
+  @Test
+  void testGetWhitelistDetailsByAgency_whenNoDataExists() {
+    String agencia = "001";
+    when(whitelistJpaRepository.findByAgencia(agencia)).thenReturn(List.of());
+
+    List<WhitelistDTO> result = whitelistService.getWhitelistDetailsByAgency(agencia);
+
+    assertTrue(result.isEmpty(), "Expected empty list when no data exists");
+    verify(whitelistJpaRepository, times(1)).findByAgencia(agencia);
+  }
+
+  @Test
+  void testGetWhitelistDetailsByAgency_withNullResponseFromRepository() {
+    String agencia = "001";
+    when(whitelistJpaRepository.findByAgencia(agencia)).thenReturn(null);
+
+    List<WhitelistDTO> result = whitelistService.getWhitelistDetailsByAgency(agencia);
+
+    assertTrue(result.isEmpty(), "Expected empty list when repository returns null");
+    verify(whitelistJpaRepository, times(1)).findByAgencia(agencia);
+  }
+
+  @Test
+  void testGetWhitelistDetailsByAgency_whenRepositoryThrowsException() {
+    String agencia = "001";
+    when(whitelistJpaRepository.findByAgencia(agencia))
+        .thenThrow(new RuntimeException("Database error"));
+
+    List<WhitelistDTO> result = whitelistService.getWhitelistDetailsByAgency(agencia);
+
+    assertTrue(result.isEmpty(), "Expected empty list when repository throws exception");
+    verify(whitelistJpaRepository, times(1)).findByAgencia(agencia);
   }
 }
