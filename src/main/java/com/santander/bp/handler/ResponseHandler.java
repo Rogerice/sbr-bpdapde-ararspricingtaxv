@@ -61,7 +61,7 @@ public final class ResponseHandler {
         }
 
         logErrors(response);
-        throw new AltairException("ERRO_ALTAPLATAFORMA", "Erro na transação", "Detalhes dos erros encontrados");
+        throw new AltairException("ERRO ALTAIR", "Erro na transação", "Detalhes dos erros encontrados");
     }
 
     private static boolean isInvalidErrorList(ResponseDto response) {
@@ -69,7 +69,7 @@ public final class ResponseHandler {
     }
 
     private static void logErrors(ResponseDto response) {
-        log.warn("Erro retornado pela alta plataforma.");
+        log.warn("Erro retornado altair ");
         for (PsError error : response.getObjeto().getListaErros()) {
             log.warn("Código do Erro: {}, Mensagem do Erro: {}", error.getCodigo(), error.getMensagem());
         }
