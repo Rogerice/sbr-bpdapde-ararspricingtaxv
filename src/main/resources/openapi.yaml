@@ -9,7 +9,7 @@ info:
     name: "Apache"
     url: https://www.apache.org/licenses/LICENSE-2.0
 servers:
-  - url: /bp_offer_pricing
+  - url: /api
 tags:
   - name: Offers and Rates
     description: Self-Issued Fixed Income Investment products

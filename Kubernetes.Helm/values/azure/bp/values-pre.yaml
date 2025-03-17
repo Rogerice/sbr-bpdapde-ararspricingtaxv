@@ -1,43 +1,112 @@
 replicaCount: 1
+
 image:
-    repository: 
-    pullPolicy: IfNotPresent
-    tag: ''
+  repository: sbr-docker-repo.santander.com.br/ars-pricing-tax-v1
+  pullPolicy: IfNotPresent
+  tag: "latest"
+
 imagePullSecrets: []
-nameOverride: ''
-fullnameOverride: ''
+nameOverride: "ars-pricing-tax-v1"
+fullnameOverride: "ars-pricing-tax-v1"
+
 serviceAccount:
-    create: true
-    annotations: {}
-    name: ''
+  create: true
+  annotations: {}
+  name: ""
+
 podAnnotations: {}
 podSecurityContext: {}
+
 securityContext: {}
+
 service:
-    type: ClusterIP
-    port: 80
+  type: ClusterIP
+  port: 80
+
 ingress:
-    enabled: false
-    annotations: {}
-    hosts:
-      - host: chart-example.local
-        paths: []
-    tls: []
+  enabled: false
+  annotations: {}
+  hosts:
+    - host: ars-pricing-tax.local
+      paths: []
+  tls: []
+
 resources: {}
+
 autoscaling:
-    enabled: false
-    minReplicas: 1
-    maxReplicas: 100
-    targetCPUUtilizationPercentage: 80
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+
 nodeSelector: {}
 tolerations: []
 affinity: {}
+
 env:
   - name: APP_NAME
-    value: ars-pricing-tax-v1
+    value: "ars-pricing-tax-v1"
+  - name: PROJECT_NAME
+    value: "BP"
+  - name: ENVIRONMENT
+    value: "dev"
+  - name: JAVA_OPTS_EXT
+    value: "-XX:MaxRAMPercentage=80.0 -XX:+UseContainerSupport -XX:+UseG1GC -Djava.security.egd=file:/dev/./urandom -Dfile.encoding=UTF8 -Djava.net.preferIPv4Stack=true"
+  - name: REGION
+    value: "brasil"
+  - name: TZ
+    value: "America/Sao_Paulo"
+  - name: PORT
+    value: "8080"
+  - name: SERVER_PORT
+    value: "8080"
+  - name: POSTGRES_URL
+    value: "jdbc:postgresql://sbrd1zb1apfbp0brscomm001.postgres.database.azure.com:5432/pgds333?sslmode=require"
+  - name: POSTGRES_USER
+    value: "svc_d_bp_01"
+  - name: POSTGRES_PASSWORD
+    value: "hp?1k3AS6Cj@S?@3"
+  - name: DATABASE_URL
+    value: "https://sbri1zb1cdbbp0brscrit002.documents.azure.com:443/"
+  - name: DATABASE_KEY
+    value: "C4O9BfiknijubnWykIu5RBtXA0vwUt1EoP2ujQ6EzG6QJxGzxqh3TCw6OXME73gLp2FyIN0kZojSACDbWjG6eQ=="
+  - name: DATABASE_NAME
+    value: "bp"
+  - name: CONNECTION_TYPE
+    value: "KEY"
+  - name: ALTAIR_MQ_USER
+    value: "MQM3K"
+  - name: ALTAIR_MQ_CHANNEL
+    value: "CHANNEL1"
+  - name: ALTAIR_MQ_QUEUE_REQUEST_NAME
+    value: "BP.QR.REQUEST.PS7"
+  - name: ALTAIR_MQ_QUEUE_RESPONSE_NAME
+    value: "BP.QL.ANSWER.PSX"
+  - name: ALTAIR_MQ_QUEUE_SERVER_HOSTNAME
+    value: "mq.online.santanderbr.pre.corp"
+  - name: ALTAIR_MQ_QUEUE_SERVER_PORT
+    value: "1414"
+  - name: ALTAIR_MQ_PATH
+    value: "/app/configs/altair.yml"
+  - name: HOST_RHSSO
+    value: "https://login.azure.paas.santanderbr.pre.corp"
+  - name: RHSSO_REALM
+    value: "corp"
+
 probe:
-    path: /actuator/health
-    port: http
-    initialDelaySecondsLiveness: 60
-    initialDelaySecondsReadness: 60
+  path: pricing-tax/actuator/health
+  port: http
+  initialDelaySecondsLiveness: 60
+  initialDelaySecondsReadness: 60
+
 containerPort: 8080
+
+volumes:
+  - name: altair
+    configMap:
+      defaultMode: 420
+      name: altair
+
+volumeMounts:
+  - name: altair
+    mountPath: /app/configs

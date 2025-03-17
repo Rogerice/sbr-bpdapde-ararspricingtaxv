@@ -46,7 +46,7 @@ server:
   servlet:
     encoding:
       charset: UTF-8
-    context-path: /ars-pricing-tax-v1
+    context-path: /pricing-tax
 
 azure:
   cosmos:
