@@ -29,7 +29,7 @@ public class OfferCosmosDTO {
   private String productDescription;
 
   @JsonProperty("family_code")
-  private String familyCode;
+  private String family;
 
   @JsonProperty("channel_code")
   private String channelCode;

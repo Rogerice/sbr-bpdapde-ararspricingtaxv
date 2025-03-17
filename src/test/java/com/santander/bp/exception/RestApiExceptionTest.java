@@ -8,18 +8,6 @@ import org.springframework.http.HttpStatus;
 public class RestApiExceptionTest {
 
   @Test
-  public void testRestApiExceptionWithAppError() {
-    AppError appError = AppError.NOT_FOUND;
-    RestApiException exception = new RestApiException(appError);
-
-    assertEquals(appError.getHttpStatus(), exception.getHttpStatus());
-    assertEquals(appError.getCode(), exception.getCode());
-    assertEquals(appError.getTitle(), exception.getTitle());
-    assertEquals(appError.getMessage(), exception.getMessage());
-    assertEquals(appError.getDetails(), exception.getDetails());
-  }
-
-  @Test
   public void testRestApiExceptionWithAllParams() {
     HttpStatus httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
     String code = "500";

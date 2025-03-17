@@ -1,160 +1,66 @@
 package com.santander.bp.integration.delegate;
 
-import com.santander.bp.api.OffersAndRatesApiDelegate;
-import com.santander.bp.exception.RestApiException;
-import com.santander.bp.model.Error.LevelEnum;
-import com.santander.bp.model.Errors;
-import com.santander.bp.model.OffersPricingRequest;
-import com.santander.bp.model.OffersPricingResponse;
-import com.santander.bp.model.ResponseWrapper;
-import com.santander.bp.service.OffersPricingServiceBP82;
-import com.santander.bp.service.OffersService;
-import com.santander.bp.service.whitelist.WhitelistService;
-import com.santander.bp.util.ErrorBuilderUtil;
-import com.santander.bp.util.ResponseBuilderUtil;
-import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import lombok.Generated;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-@Generated
+import com.santander.bp.api.OffersAndRatesApiDelegate;
+import com.santander.bp.exception.RestApiException;
+import com.santander.bp.model.Errors;
+import com.santander.bp.model.ErrorLevel; 
+import com.santander.bp.model.OffersPricingRequest;
+import com.santander.bp.model.ResponseWrapper;
+import com.santander.bp.service.OffersProcessingService;
+import com.santander.bp.util.ErrorBuilderUtil;
+import com.santander.bp.util.ResponseBuilderUtil;
+
+import lombok.extern.slf4j.Slf4j;
+
 @Slf4j
 @Service
 public class OffersAndRatesApiDelegateImpl implements OffersAndRatesApiDelegate {
 
-  @Autowired private OffersPricingServiceBP82 offersPricingServiceBP82;
+    private final OffersProcessingService offersProcessingService;
 
-  @Autowired private OffersService offersService;
-
-  @Autowired private WhitelistService whitelistService;
-
-  @Override
-  public CompletableFuture<ResponseEntity<ResponseWrapper>> offersPost(
-      OffersPricingRequest offersPricingRequest) {
-
-    log.info("Recebendo solicitação de ofertas com dados: {}", offersPricingRequest);
-
-    CompletableFuture<ResponseEntity<ResponseWrapper>> future = new CompletableFuture<>();
-
-    try {
-      // Validação de CPF/CNPJ e agência na whitelist
-      boolean isDocumentInWhitelist =
-          whitelistService.isInWhitelist(
-              offersPricingRequest.getDocumentType(), offersPricingRequest.getDocumentNumber());
-
-      boolean isAgencyInWhitelist =
-          !isDocumentInWhitelist
-              && whitelistService.isAgencyInWhitelist(offersPricingRequest.getCenterId());
-
-      if (isDocumentInWhitelist || isAgencyInWhitelist) {
-        log.info(
-            "Cliente está na whitelist. DocumentType: {}, DocumentNumber: {}, CenterId: {}",
-            offersPricingRequest.getDocumentType(),
-            offersPricingRequest.getDocumentNumber(),
-            offersPricingRequest.getCenterId());
-
-        processWhitelistOffers(offersPricingRequest, future);
-      } else {
-        log.info(
-            "Cliente não está na whitelist. Processando pelo fluxo principal. DocumentType: {}, DocumentNumber: {}, CenterId: {}",
-            offersPricingRequest.getDocumentType(),
-            offersPricingRequest.getDocumentNumber(),
-            offersPricingRequest.getCenterId());
-
-        processNonWhitelistOffers(offersPricingRequest, future);
-      }
-    } catch (RestApiException e) {
-      log.error("Erro de API ao processar solicitação: {}", e.getMessage(), e);
-      handleRestApiException(e, future);
-    } catch (Exception e) {
-      log.error("Erro inesperado ao processar solicitação: {}", e.getMessage(), e);
-      handleUnexpectedException(e, future);
+    public OffersAndRatesApiDelegateImpl(OffersProcessingService offersProcessingService) {
+        this.offersProcessingService = offersProcessingService;
     }
 
-    return future;
-  }
+    @Override
+    public CompletableFuture<ResponseEntity<ResponseWrapper>> offersPost(OffersPricingRequest request) {
+        long startTime = System.currentTimeMillis();
+        log.info("Recebendo requisição no offersPost: {}", request);
 
-  private void processWhitelistOffers(
-      OffersPricingRequest offersPricingRequest,
-      CompletableFuture<ResponseEntity<ResponseWrapper>> future) {
-    try {
-      log.debug("Buscando ofertas para cliente na whitelist.");
-      List<OffersPricingResponse> cosmosOffers =
-          offersService.getOffers(
-              offersPricingRequest.getSegment(), offersPricingRequest.getChannel(), "26");
+        return offersProcessingService.processOffers(request)
+                .thenApply(responseList -> {
+                    ResponseWrapper responseWrapper = new ResponseWrapper();
+                    responseWrapper.setData(responseList);
 
-      if (cosmosOffers.isEmpty()) {
-        log.warn("Nenhuma oferta encontrada no CosmosDB para os critérios especificados.");
-        Errors errorResponse =
-            ErrorBuilderUtil.buildNotFoundError(
-                "Nenhuma oferta foi encontrada com os critérios especificados no CosmosDB");
-        future.complete(
-            ResponseBuilderUtil.buildErrorResponse(errorResponse, HttpStatus.NOT_FOUND));
-      } else {
-        log.info("Ofertas encontradas no CosmosDB: {}", cosmosOffers);
-        future.complete(ResponseBuilderUtil.buildSuccessResponse(cosmosOffers));
-      }
-    } catch (RestApiException e) {
-      log.error("Erro de API ao buscar ofertas no CosmosDB: {}", e.getMessage(), e);
-      handleRestApiException(e, future);
+                    long totalTime = System.currentTimeMillis();
+                    log.info("Tempo total de processamento: {} ms", (totalTime - startTime));
+
+                    return ResponseEntity.ok(responseWrapper);
+                })
+                .exceptionally(ex -> handleException(ex));
     }
-  }
 
-  private void processNonWhitelistOffers(
-      OffersPricingRequest offersPricingRequest,
-      CompletableFuture<ResponseEntity<ResponseWrapper>> future) {
-    try {
-      log.debug("Buscando ofertas para cliente fora da whitelist.");
+    private ResponseEntity<ResponseWrapper> handleException(Throwable ex) {
+        if (ex.getCause() instanceof RestApiException restApiException) {
+            log.error("Erro de API: {}", restApiException.getMessage(), restApiException);
+            Errors errorResponse = ErrorBuilderUtil.buildError(
+                    restApiException.getCode(),
+                    restApiException.getMessage(),
+                    restApiException.getTitle(),
+                    ErrorLevel.ERROR
+            );
 
-      List<OffersPricingResponse> responseList =
-          offersPricingServiceBP82.processOffers(offersPricingRequest);
+            return ResponseBuilderUtil.buildErrorResponse(errorResponse, restApiException.getHttpStatus());
+        }
 
-      if (responseList.isEmpty()) {
-        log.warn("Nenhuma oferta encontrada para os parâmetros fornecidos.");
-        Errors errorResponse =
-            ErrorBuilderUtil.buildError(
-                "NOT_FOUND",
-                "Nenhuma oferta encontrada",
-                "Nenhuma oferta foi encontrada para os parâmetros fornecidos",
-                LevelEnum.INFO);
-        future.complete(
-            ResponseBuilderUtil.buildErrorResponse(errorResponse, HttpStatus.NOT_FOUND));
-      } else {
-        log.info("Ofertas encontradas: {}", responseList);
-        ResponseWrapper responseWrapper = new ResponseWrapper();
-        responseWrapper.setData(responseList);
-        future.complete(ResponseEntity.ok(responseWrapper));
-      }
-    } catch (RestApiException e) {
-      log.error(
-          "Erro de API ao processar ofertas para cliente fora da whitelist: {}", e.getMessage(), e);
-      handleRestApiException(e, future);
-    } catch (Exception e) {
-      log.error(
-          "Erro inesperado ao processar ofertas para cliente fora da whitelist: {}",
-          e.getMessage(),
-          e);
-      handleUnexpectedException(e, future);
+        log.error("Erro inesperado no offersPost: {}", ex.getMessage(), ex);
+        Errors errorResponse = ErrorBuilderUtil.buildServerError(ex.getMessage());
+        return ResponseBuilderUtil.buildErrorResponse(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
-  }
-
-  private void handleRestApiException(
-      RestApiException e, CompletableFuture<ResponseEntity<ResponseWrapper>> future) {
-    log.error("Erro de API capturado: {}", e.getMessage(), e);
-    Errors errorResponse =
-        ErrorBuilderUtil.buildError(e.getCode(), e.getMessage(), e.getTitle(), LevelEnum.ERROR);
-    future.complete(ResponseBuilderUtil.buildErrorResponse(errorResponse, e.getHttpStatus()));
-  }
-
-  private void handleUnexpectedException(
-      Exception e, CompletableFuture<ResponseEntity<ResponseWrapper>> future) {
-    log.error("Erro inesperado capturado: {}", e.getMessage(), e);
-    Errors errorResponse = ErrorBuilderUtil.buildServerError(e.getMessage());
-    future.complete(
-        ResponseBuilderUtil.buildErrorResponse(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR));
-  }
 }

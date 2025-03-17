@@ -16,7 +16,7 @@ public class OfferCosmosDTOTest {
             .id("1")
             .product("Product1")
             .productDescription("Product Description")
-            .familyCode("Family1")
+            .family("Family1")
             .channelCode("Channel1")
             .cdSegm("Segment1")
             .tpSegm("Type1")
@@ -27,7 +27,7 @@ public class OfferCosmosDTOTest {
     assertEquals("1", offer.getId());
     assertEquals("Product1", offer.getProduct());
     assertEquals("Product Description", offer.getProductDescription());
-    assertEquals("Family1", offer.getFamilyCode());
+    assertEquals("Family1", offer.getFamily());
     assertEquals("Channel1", offer.getChannelCode());
     assertEquals("Segment1", offer.getCdSegm());
     assertEquals("Type1", offer.getTpSegm());
@@ -43,7 +43,7 @@ public class OfferCosmosDTOTest {
     offer.setId("1");
     offer.setProduct("Product1");
     offer.setProductDescription("Product Description");
-    offer.setFamilyCode("Family1");
+    offer.setFamily("Family1");
     offer.setChannelCode("Channel1");
     offer.setCdSegm("Segment1");
     offer.setTpSegm("Type1");
@@ -53,7 +53,7 @@ public class OfferCosmosDTOTest {
     assertEquals("1", offer.getId());
     assertEquals("Product1", offer.getProduct());
     assertEquals("Product Description", offer.getProductDescription());
-    assertEquals("Family1", offer.getFamilyCode());
+    assertEquals("Family1", offer.getFamily());
     assertEquals("Channel1", offer.getChannelCode());
     assertEquals("Segment1", offer.getCdSegm());
     assertEquals("Type1", offer.getTpSegm());

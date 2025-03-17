@@ -1,22 +1,23 @@
 package com.santander.bp.service;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 import com.santander.bp.app.mapper.CosmosDbMapper;
 import com.santander.bp.model.OfferCosmosDTO;
 import com.santander.bp.model.OffersPricingResponse;
 import com.santander.bp.repository.OffersCosmosDbRepository;
-import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+@ExtendWith(MockitoExtension.class)
 class CosmosDbServiceTest {
 
   @Mock private OffersCosmosDbRepository offerRepository;
@@ -25,35 +26,55 @@ class CosmosDbServiceTest {
 
   @InjectMocks private CosmosDbService cosmosDbService;
 
+  private static final Logger logger = LoggerFactory.getLogger(CosmosDbService.class);
+
+  private List<OfferCosmosDTO> mockOffers;
+  private List<OffersPricingResponse> mockResponses;
+
   @BeforeEach
   void setUp() {
-    MockitoAnnotations.openMocks(this);
+    OfferCosmosDTO offerDTO = new OfferCosmosDTO();
+    offerDTO.setCdSegm("001");
+    offerDTO.setChannelCode("APP");
+    offerDTO.setProduct("INVEST");
+    mockOffers = List.of(offerDTO);
+
+    OffersPricingResponse pricingResponse = new OffersPricingResponse();
+    mockResponses = List.of(pricingResponse);
   }
 
   @Test
-  void testGetOffers_OffersAvailable() {
+  void testGetOffers_Success() {
+    when(offerRepository.findOffers("001", "APP", "INVEST")).thenReturn(mockOffers);
+    when(cosmosDbMapper.mapOffers(mockOffers)).thenReturn(mockResponses);
 
-    OfferCosmosDTO offer = new OfferCosmosDTO();
-    offer.setId("offer-1");
-    offer.setProduct("26");
-    when(offerRepository.findOffers(any(), any(), any())).thenReturn(List.of(offer));
+    List<OffersPricingResponse> result = cosmosDbService.getOffers("001", "APP", "INVEST");
 
-    OffersPricingResponse responseMock = new OffersPricingResponse();
-    responseMock.setId("offer-1");
-    when(cosmosDbMapper.mapToOfferResponseDTO(any())).thenReturn(responseMock); // Mockando o mapper
-
-    List<OffersPricingResponse> response = cosmosDbService.getOffers("ALL", "ONLINE", "26");
-
-    assertEquals(1, response.size());
-    assertEquals("offer-1", response.get(0).getId());
+    assertFalse(result.isEmpty());
+    assertEquals(1, result.size());
+    verify(offerRepository, times(1)).findOffers("001", "APP", "INVEST");
+    verify(cosmosDbMapper, times(1)).mapOffers(mockOffers);
   }
 
   @Test
-  void testGetOffers_NoOffersFound() {
+  void testGetOffers_EmptyResult() {
+    when(offerRepository.findOffers("001", "APP", "INVEST")).thenReturn(List.of());
 
-    when(offerRepository.findOffers(any(), any(), any())).thenReturn(Collections.emptyList());
+    List<OffersPricingResponse> result = cosmosDbService.getOffers("001", "APP", "INVEST");
 
-    List<OffersPricingResponse> offers = cosmosDbService.getOffers("ALL", "ONLINE", "26");
-    assertNotNull(offers);
+    assertTrue(result.isEmpty());
+    verify(offerRepository, times(1)).findOffers("001", "APP", "INVEST");
+    verifyNoInteractions(cosmosDbMapper);
+  }
+
+  @Test
+  void testGetOffers_NullResult() {
+    when(offerRepository.findOffers("001", "APP", "INVEST")).thenReturn(null);
+
+    List<OffersPricingResponse> result = cosmosDbService.getOffers("001", "APP", "INVEST");
+
+    assertTrue(result.isEmpty());
+    verify(offerRepository, times(1)).findOffers("001", "APP", "INVEST");
+    verifyNoInteractions(cosmosDbMapper);
   }
 }

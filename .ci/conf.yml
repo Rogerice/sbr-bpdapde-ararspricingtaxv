@@ -22,7 +22,7 @@ environment:
     appScan:
       repository: null
     cloudProvider: &id001
-    - OC
+    - AZURE
   pi:
     smokeTest:
       type: null
@@ -64,7 +64,7 @@ environment:
     appScan:
       repository: null
     cloudProvider: &id002
-    - OC
+    - AZURE
   green:
     cloudProvider: *id002
 acronymTargetCluster: BP
