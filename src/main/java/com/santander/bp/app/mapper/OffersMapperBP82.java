@@ -6,12 +6,17 @@ import com.altec.bsbr.fw.ps.parser.object.PsScreen;
 import com.santander.bp.enums.FixedFieldsEnum;
 import com.santander.bp.model.OffersPricingRequest;
 import com.santander.bp.model.OffersPricingResponse;
-import com.santander.bp.model.RateDetails;
-import com.santander.bp.model.SubProductDetails;
+import com.santander.bp.model.OffersPricingResponseRateTermInner;
 import com.santander.bp.model.altair.BPMP82;
 import com.santander.bp.model.altair.BPMP820;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Stream;
 import lombok.Generated;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -86,43 +91,85 @@ public class OffersMapperBP82 {
     }
   }
 
-  private OffersPricingResponse construirOffersPricingResponse(BPMP820 bpmp820) {
+  public OffersPricingResponse construirOffersPricingResponse(BPMP820 bpmp820) {
     OffersPricingResponse response = new OffersPricingResponse();
-    response.setProduct(bpmp820.getPRODUTO());
-    response.setProductDescription(bpmp820.getDESSUBP());
-    response.setFamilyCode(bpmp820.getFAMILIA());
 
-    List<SubProductDetails> subProducts = new ArrayList<>();
-    SubProductDetails subProduct = construirSubProduto(bpmp820);
-    subProducts.add(subProduct);
-    response.setSubProducts(subProducts);
+    response.setProduct(bpmp820.getPRODUTO());
+    response.setSubProductCode(bpmp820.getSUBPROD());
+    response.setSubProduct(bpmp820.getDESSUBP().trim());
+    response.setFamily(bpmp820.getFAMILIA().trim());
+
+    response.setMinApplicationValue(safeConvertDouble(bpmp820.getVLRMINA()));
+    response.setMinRedemptionValue(safeConvertDouble(bpmp820.getVLRMINR()));
+    response.setMinBalance(safeConvertDouble(bpmp820.getSLDMIN()));
+    response.setClosingFee(safeConvertDouble(bpmp820.getTAXAENC()));
+    response.setReceivingFee(safeConvertDouble(bpmp820.getTAXAREC()));
+    response.setFeeDescription(bpmp820.getDESTAXA().trim());
+
+    response.setMessages(buildMessages(bpmp820));
+
+    response.setRateTerm(buildRateDetails(bpmp820));
+
+    response.setTerm(determineMainTerm(bpmp820));
 
     return response;
   }
 
-  private SubProductDetails construirSubProduto(BPMP820 bpmp820) {
-    SubProductDetails subProduct = new SubProductDetails();
-    subProduct.setSubProduct(bpmp820.getSUBPROD());
-    subProduct.setMinimumApplicationValue((float) bpmp820.getVLRMINA());
-    subProduct.setMinimumRedeemValue((float) bpmp820.getVLRMINR());
-    subProduct.setMinimumBalanceValue((float) bpmp820.getSLDMIN());
-    subProduct.setProgressiveRemunerationIndicator(bpmp820.getINDPRG());
-    subProduct.setIndexerDescription(bpmp820.getINDPRG());
-    subProduct.setGraceIndicator(bpmp820.getINCARE());
-    subProduct.setGraceTerm(bpmp820.getPRZCARE().toString());
-    subProduct.setOtherTerm(bpmp820.getOTRPRAZ());
-    subProduct.setRedeemIndicator(bpmp820.getINRESG());
-    subProduct.setFutureSchedule(bpmp820.getAGNFUTU());
-    subProduct.setOnlineHour(bpmp820.getHRONLIN());
+  private List<String> buildMessages(BPMP820 bpmp820) {
+    List<String> messages = new ArrayList<>();
+    if (bpmp820.getMENSAG1() != null) messages.add(bpmp820.getMENSAG1().trim());
+    if (bpmp820.getMENSAG2() != null) messages.add(bpmp820.getMENSAG2().trim());
+    if (bpmp820.getMENSAG3() != null) messages.add(bpmp820.getMENSAG3().trim());
+    return messages.isEmpty() ? null : messages;
+  }
 
-    List<RateDetails> rateDetailsList = new ArrayList<>();
-    RateDetails rateDetails = new RateDetails();
-    rateDetails.setTaxRate(String.valueOf(bpmp820.getTAXAENC()));
-    rateDetails.setTaxRateDescription(bpmp820.getDESTAXA());
-    rateDetails.setReceivedTaxRate(String.valueOf(bpmp820.getTAXAREC()));
-    rateDetailsList.add(rateDetails);
+  private List<OffersPricingResponseRateTermInner> buildRateDetails(BPMP820 bpmp820) {
+    Set<String> uniqueRates = new HashSet<>();
+    List<OffersPricingResponseRateTermInner> rateDetailsList = new ArrayList<>();
 
-    subProduct.setRateDetails(rateDetailsList);
-    return subProduct;
+    addRateDetailIfValid(uniqueRates, rateDetailsList, bpmp820.getPRAZO1(), bpmp820.getTAXAENC());
+    addRateDetailIfValid(uniqueRates, rateDetailsList, bpmp820.getPRAZO2(), bpmp820.getTAXAENC());
+    addRateDetailIfValid(uniqueRates, rateDetailsList, bpmp820.getPRAZO3(), bpmp820.getTAXAENC());
+    addRateDetailIfValid(uniqueRates, rateDetailsList, bpmp820.getPRZMIN(), bpmp820.getTAXAENC());
+    addRateDetailIfValid(uniqueRates, rateDetailsList, bpmp820.getPRZMAX(), bpmp820.getTAXAENC());
+
+    rateDetailsList.sort(Comparator.comparingInt(OffersPricingResponseRateTermInner::getTerm));
+
+    return rateDetailsList.isEmpty() ? null : rateDetailsList;
+  }
+
+  private void addRateDetailIfValid(
+      Set<String> uniqueRates,
+      List<OffersPricingResponseRateTermInner> rateDetailsList,
+      Integer term,
+      double rate) {
+    if (term != null && term > 0) {
+      String uniqueKey = term + "-" + rate;
+      if (!uniqueRates.contains(uniqueKey)) {
+        uniqueRates.add(uniqueKey);
+        OffersPricingResponseRateTermInner rateDetail = new OffersPricingResponseRateTermInner();
+        rateDetail.setTerm(term);
+        rateDetail.setRate(safeConvertDouble(rate));
+        rateDetailsList.add(rateDetail);
+      }
+    }
+  }
+
+  private Integer determineMainTerm(BPMP820 bpmp820) {
+    List<Integer> terms =
+        Stream.of(
+                bpmp820.getPRAZO1(),
+                bpmp820.getPRAZO2(),
+                bpmp820.getPRAZO3(),
+                bpmp820.getPRZMIN(),
+                bpmp820.getPRZMAX())
+            .filter(Objects::nonNull)
+            .toList();
+
+    return terms.isEmpty() ? null : Collections.min(terms);
+  }
+
+  private Double safeConvertDouble(double value) {
+    return value == 0.0 ? null : value;
   }
 }
