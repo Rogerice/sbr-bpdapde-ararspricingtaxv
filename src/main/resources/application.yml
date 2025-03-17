@@ -86,6 +86,7 @@ arsenal:
 logging:
   level:
     org.springframework: DEBUG
+    com.santander.bp: DEBUG
     com.altec: DEBUG
     org.hibernate.SQL: DEBUG
     org.hibernate.type.descriptor.sql.BasicBinder: TRACE

@@ -129,39 +129,101 @@ components:
           example: "LCI - Invest"
     OffersPricingResponse:
       type: object
+      description: "Response object containing investment offer details and pricing information."
       properties:
         id:
           type: string
-          description: "Offer identifier."
-          example: "2a6777effe8f5b8c2df74a49dae5f98d"
+          description: "Unique identifier for the offer."
+          example: "12345"
         product:
           type: string
-          description: "Product name."
-          example: "26"
-        productDescription:
+          description: "Investment product name."
+          example: "CDB"
+        subProductCode:
           type: string
-          description: "Description of the product."
-          example: "RENDA FIXA"
-        familyCode:
+          description: "Investment sub-product code."
+          example: "0003"
+        subProduct:
           type: string
-          description: "Family code of the product."
-          example: "LCA"
-        channelCode:
+          description: "Investment sub-product description."
+          example: "LCI - Invest"
+        family:
           type: string
-          description: "Channel code."
-          example: "52"
-        cdSegm:
-          type: string
-          description: "Segment code."
-          example: "ALL"
-        tpSegm:
-          type: string
-          description: "Segment type."
-          example: "ALL"
-        subProducts:
+          description: "Family code of the investment product."
+          example: "CDB"
+        term:
+          type: integer
+          description: "Investment term in days."
+          example: 365
+        rate:
+          type: number
+          format: double
+          description: "Rate applied to the investment offer."
+          example: 12.50
+        rateTerm:
           type: array
+          description: "List of applicable rates and their respective terms."
           items:
-            $ref: '#/components/schemas/SubProductDetails'
+            type: object
+            properties:
+              term:
+                type: integer
+                description: "Term in days."
+                example: 180
+              rate:
+                type: number
+                format: double
+                description: "Rate applied for this term."
+                example: 11.75
+        minApplicationValue:
+          type: number
+          format: double
+          description: "Minimum investment amount required."
+          example: 1000.00
+        minRedemptionValue:
+          type: number
+          format: double
+          description: "Minimum amount allowed for redemption."
+          example: 500.00
+        minBalance:
+          type: number
+          format: double
+          description: "Minimum balance required after redemption."
+          example: 100.00
+        closingFee:
+          type: number
+          format: double
+          description: "Encumbrance fee applied to the offer."
+          example: 0.5
+        receivingFee:
+          type: number
+          format: double
+          description: "Fee applied when receiving the investment."
+          example: 0.3
+        feeDescription:
+          type: string
+          description: "Description of the fees applied."
+          example: "Management and custody fees."
+        campaign:
+          type: string
+          description: "Associated investment campaign, if applicable."
+          example: "High-Yield Bonds Promo"
+        funding:
+          type: number
+          format: double
+          description: "Total funding allocated to this investment offer."
+          example: 5000000.00
+        reason:
+          type: string
+          description: "Reason associated with the offer."
+          example: "Special Promotion"
+        messages:
+          type: array
+          description: "List of additional messages related to the offer."
+          items:
+            type: string
+          example: ["Limited-time offer", "Available for VIP customers only"]
+
     ResponseWrapper:
       type: object
       properties:
@@ -176,83 +238,6 @@ components:
             $ref: '#/components/schemas/Error'
           description: "List of errors"
           example: []
-    SubProductDetails:
-      type: object
-      properties:
-        sub_product:
-          type: string
-          description: "Subproduct name."
-          example: "LCA SEL 361 DIG DIAS"
-        sub_code:
-          type: string
-          description: "Subproduct code."
-          example: "0232"
-        minimum_application_value:
-          type: number
-          format: float
-          description: "Minimum application value."
-          example: 1000
-        minimum_redeem_value:
-          type: number
-          format: float
-          description: "Minimum redeem value."
-          example: 500
-        minimum_balance_value:
-          type: number
-          format: float
-          description: "Minimum balance value."
-          example: 1000
-        progressive_remuneration_indicator:
-          type: string
-          description: "Indicator if progressive remuneration is applied."
-          example: "N"
-        indexer_description:
-          type: string
-          description: "Description of the indexer."
-          example: "CDI"
-        grace_indicator:
-          type: string
-          description: "Grace period indicator."
-          example: "N"
-        grace_term:
-          type: string
-          description: "Grace period term."
-          example: "99999"
-        other_term:
-          type: string
-          description: "Other term indicator."
-          example: "S"
-        redeem_indicator:
-          type: string
-          description: "Redeem indicator."
-          example: "S"
-        future_schedule:
-          type: string
-          description: "Future schedule indicator."
-          example: "S"
-        online_hour:
-          type: string
-          description: "Online hour information."
-          example: "20:10:00"
-        rate_details:
-          type: array
-          items:
-            $ref: '#/components/schemas/RateDetails'
-    RateDetails:
-      type: object
-      properties:
-        tax_rate:
-          type: string
-          description: "Encoded tax rate, typically a string representing basis points."
-          example: "00268000"
-        tax_rate_description:
-          type: string
-          description: "Human-readable tax rate description."
-          example: "2,68% a.a."
-        received_tax_rate:
-          type: string
-          description: "Received tax rate from an external service."
-          example: "00700000"
     Errors:
       type: object
       description: "Data structure containing the details for errors."
@@ -279,17 +264,19 @@ components:
           description: "Brief summary of the reported issue."
           example: "Invalid Action"
         level:
-          type: string
-          description: "Level of the reported issue."
-          enum:
-            - info
-            - warning
-            - error
-          example: "error"
+          $ref: '#/components/schemas/ErrorLevel'
         description:
           type: string
           description: "Detailed description of the reported issue."
           example: "The request parameter is invalid."
+    ErrorLevel:
+      type: string
+      description: "Level of the reported issue."
+      enum:
+        - INFO
+        - WARNING
+        - ERROR
+      example: "ERROR"
   responses:
     NoContent:
       description: "No content."
