@@ -38,7 +38,7 @@ public class PricingEngineService {
         .build();
   }
 
-  private Integer getLowestTerm(List<OffersPricingResponseRateTermInner> rateTerms) {
+  protected Integer getLowestTerm(List<OffersPricingResponseRateTermInner> rateTerms) {
     return rateTerms.stream()
         .map(OffersPricingResponseRateTermInner::getTerm)
         .min(Integer::compareTo)

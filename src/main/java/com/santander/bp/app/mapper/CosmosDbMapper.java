@@ -46,7 +46,7 @@ public class CosmosDbMapper {
     return response;
   }
 
-  private SubProductCosmosDTO getBestSubProduct(OfferCosmosDTO offer) {
+  protected SubProductCosmosDTO getBestSubProduct(OfferCosmosDTO offer) {
     if (offer.getSubProducts() == null || offer.getSubProducts().isEmpty()) {
       log.warn("Nenhum subproduto encontrado para a oferta ID: {}", offer.getId());
       return null;
@@ -64,7 +64,7 @@ public class CosmosDbMapper {
         .orElse(null);
   }
 
-  private Double convertToDouble(Integer value) {
+  protected Double convertToDouble(Integer value) {
     Double result = (value != null) ? value.doubleValue() : null;
 
     log.debug("Convertendo Integer para Double: Entrada={}, Saída={}", value, result);
