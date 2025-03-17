@@ -4,6 +4,9 @@ import lombok.Generated;
 
 @Generated
 public class CosmosDbException extends RuntimeException {
+  /** */
+  private static final long serialVersionUID = 1L;
+
   private final String code;
   private final String description;
 

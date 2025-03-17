@@ -13,15 +13,6 @@ public class RestApiException extends RuntimeException {
   private final String message;
   private transient Object details;
 
-  public RestApiException(AppError appError) {
-    super(appError.getMessage());
-    this.httpStatus = appError.getHttpStatus();
-    this.code = appError.getCode();
-    this.title = appError.getTitle();
-    this.message = appError.getMessage();
-    this.details = appError.getDetails();
-  }
-
   public RestApiException(
       HttpStatus httpStatus, String code, String title, String message, Object details) {
     super(message);
