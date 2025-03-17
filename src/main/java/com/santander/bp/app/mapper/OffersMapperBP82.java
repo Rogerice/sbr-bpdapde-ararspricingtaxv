@@ -170,6 +170,6 @@ public class OffersMapperBP82 {
   }
 
   private Double safeConvertDouble(double value) {
-    return value == 0.0 ? null : value;
+    return Double.compare(value, 0.0) == 0 ? null : value;
   }
 }
