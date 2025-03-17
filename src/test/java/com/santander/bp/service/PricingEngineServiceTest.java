@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 
 import com.santander.bp.model.OffersPricingResponse;
 import com.santander.bp.model.OffersPricingResponseRateTermInner;
+import java.util.Collection;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -35,14 +36,14 @@ class PricingEngineServiceTest {
             .messages(List.of("Test message"))
             .build();
 
-    List<OffersPricingResponse> enrichedOffers =
+    Collection<OffersPricingResponse> enrichedOffers =
         pricingEngineService.enrichOffersWithMockRates(List.of(originalOffer));
 
     // Verificações
     assertNotNull(enrichedOffers);
     assertEquals(1, enrichedOffers.size());
 
-    OffersPricingResponse enrichedOffer = enrichedOffers.get(0);
+    OffersPricingResponse enrichedOffer = enrichedOffers.iterator().next();
     assertEquals("123", enrichedOffer.getId());
     assertEquals("Investment", enrichedOffer.getProduct());
     assertNotNull(enrichedOffer.getRateTerm());
@@ -53,7 +54,7 @@ class PricingEngineServiceTest {
 
   @Test
   void testGetLowestTerm_ReturnsCorrectly() {
-    List<OffersPricingResponseRateTermInner> rateTerms =
+    Collection<OffersPricingResponseRateTermInner> rateTerms =
         List.of(
             new OffersPricingResponseRateTermInner(180, 12.5),
             new OffersPricingResponseRateTermInner(365, 11.0));
