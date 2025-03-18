@@ -117,9 +117,17 @@ public class OffersMapperBP82 {
 
   private List<String> buildMessages(BPMP820 bpmp820) {
     List<String> messages = new ArrayList<>();
-    if (bpmp820.getMENSAG1() != null) messages.add(bpmp820.getMENSAG1().trim());
-    if (bpmp820.getMENSAG2() != null) messages.add(bpmp820.getMENSAG2().trim());
-    if (bpmp820.getMENSAG3() != null) messages.add(bpmp820.getMENSAG3().trim());
+
+    if (bpmp820.getMENSAG1() != null && !bpmp820.getMENSAG1().trim().isEmpty()) {
+      messages.add(bpmp820.getMENSAG1().trim());
+    }
+    if (bpmp820.getMENSAG2() != null && !bpmp820.getMENSAG2().trim().isEmpty()) {
+      messages.add(bpmp820.getMENSAG2().trim());
+    }
+    if (bpmp820.getMENSAG3() != null && !bpmp820.getMENSAG3().trim().isEmpty()) {
+      messages.add(bpmp820.getMENSAG3().trim());
+    }
+
     return messages.isEmpty() ? null : messages;
   }
 
