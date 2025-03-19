@@ -69,9 +69,42 @@ paths:
                   - code: "ERR008"
                     message: "Gateway timeout"
                     level: "error"
-                    description: "The request timed out while waiting for a response."
+  /pricing:
+    post:
+      tags:
+        - Offers and Rates
+      summary: "Fetch pricing details for fixed income investment offers."
+      description: "This endpoint retrieves pricing details for investment offers, including customer-specific conditions."
+      requestBody:
+        description: "Data required to fetch pricing details for offers"
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PricingRequest'
+        required: true
+      responses:
+        '200':
+          description: "Successful retrieval of pricing details"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseWrapper'
+        '400':
+          description: "Bad Request"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Errors'
+        '500':
+          description: "Internal Server Error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Errors'
 components:
   schemas:
+
+
     OffersPricingRequest:
       type: object
       required:
@@ -127,14 +160,124 @@ components:
           type: string
           description: "By-product chosen in the offer"
           example: "LCI - Invest"
+          
+    PricingRequest:
+      type: object
+      required:
+        - channel
+        - company
+        - customerData
+        - system
+        - pricingType
+        - segment
+        - currency
+        - appliedAmount
+        - proposals
+      properties:
+        channel:
+          type: string
+          description: "Código do canal de chamada."
+          example: "52"
+        company:
+          type: string
+          description: "Código da empresa que está acessando a API para retornar o preço."
+          example: "0033"
+        customerData:
+          type: object
+          required:
+            - documentType
+            - documentNumber
+          properties:
+            documentType:
+              type: number
+              description: "Tipo de documento do cliente (1: PF, 2: PJ)."
+              example: 1
+            documentNumber:
+              type: string
+              description: "Número do documento (CPF ou CNPJ)."
+              example: "12345678900"
+            penumperCode:
+              type: string
+              description: "Código Penumper do cliente cadastrado."
+              example: "PEN123456"
+        voucher:
+          type: string
+          description: "Voucher promocional para flexibilização de preço."
+          example: "PROMO2024"
+        system:
+          type: string
+          description: "Código do sistema que está chamando a API."
+          example: "BP"
+        pricingType:
+          type: string
+          description: "Tipo de chamada de precificação (R1 ou R2)."
+          example: "R1"
+        segment:
+          type: string
+          description: "Código do segmento do cliente cadastrado (3 dígitos)."
+          example: "ALL"
+        currency:
+          type: string
+          description: "Código da moeda em que o valor da receita será ofertada."
+          example: "BRL"
+        appliedAmount:
+          type: number
+          description: "Valor da aplicação no produto."
+          example: 10000
+        proposals:
+          type: array
+          description: "Lista de propostas enviadas pelo sistema produto."
+          items:
+            type: object
+            required:
+              - idSystem
+              - product
+              - indexType
+              - subProduct
+              - totalTerm
+            properties:
+              idSystem:
+                type: number
+                description: "Identificação de cotação, gerado pelo sistema de chamada."
+                example: 123456
+              product:
+                type: string
+                description: "Nome do produto."
+                example: "CDB"
+              indexType:
+                type: string
+                description: "Tipo de indexador (CDI, IPCA, PRE, PROG)."
+                example: "CDI"
+              subProduct:
+                type: string
+                description: "Código do subproduto."
+                example: "0013"
+              totalTerm:
+                type: number
+                description: "Valor do prazo total do período de investimento."
+                example: 365
+              progressiveTerms:
+                type: array
+                description: "Lista de números inteiros dos prazos a serem precificados."
+                items:
+                  type: number
+                example: [30, 60, 90]
+              gracePeriod:
+                type: number
+                description: "Valor do prazo de carência."
+                example: 90
     OffersPricingResponse:
       type: object
       description: "Response object containing investment offer details and pricing information."
       properties:
-        id:
+        idAdapter:
           type: string
-          description: "Unique identifier for the offer."
-          example: "12345"
+          description: "Adapter identifier, generated by the pricing process."
+          example: "ADP123456"
+        idPricingPolicy:
+          type: string
+          description: "Unique identifier for the pricing policy applied to each proposal."
+          example: "PREC-001"
         product:
           type: string
           description: "Investment product name."
@@ -204,15 +347,15 @@ components:
           type: string
           description: "Description of the fees applied."
           example: "Management and custody fees."
-        campaign:
+        voucher:
           type: string
           description: "Associated investment campaign, if applicable."
           example: "High-Yield Bonds Promo"
         funding:
-          type: number
-          format: double
-          description: "Total funding allocated to this investment offer."
-          example: 5000000.00
+          type: string
+          format: decimal
+          description: "Total funding allocated to this investment offer, ensuring precision."
+          example: "5000000.00"
         reason:
           type: string
           description: "Reason associated with the offer."
@@ -223,7 +366,6 @@ components:
           items:
             type: string
           example: ["Limited-time offer", "Available for VIP customers only"]
-
     ResponseWrapper:
       type: object
       properties:

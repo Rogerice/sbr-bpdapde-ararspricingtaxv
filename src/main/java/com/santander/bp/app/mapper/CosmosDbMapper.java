@@ -13,29 +13,31 @@ import org.springframework.stereotype.Component;
 public class CosmosDbMapper {
 
   public List<OffersPricingResponse> mapOffers(List<OfferCosmosDTO> offers) {
-    return offers.stream().map(this::mapToOfferResponseDTO).collect(Collectors.toList());
+    return offers.stream()
+        .flatMap(
+            offer ->
+                offer.getSubProducts().stream()
+                    .map(subProduct -> mapToOfferResponseDTO(offer, subProduct)))
+        .collect(Collectors.toList());
   }
 
-  public OffersPricingResponse mapToOfferResponseDTO(OfferCosmosDTO offer) {
-    SubProductCosmosDTO subProduct = getBestSubProduct(offer);
-
+  public OffersPricingResponse mapToOfferResponseDTO(
+      OfferCosmosDTO offer, SubProductCosmosDTO subProduct) {
     OffersPricingResponse response =
         OffersPricingResponse.builder()
-            .id(offer.getId())
+            .idAdapter(offer.getId())
             .product(offer.getProduct())
-            .subProduct(subProduct != null ? subProduct.getNmSubp() : offer.getProductDescription())
+            .subProduct(subProduct.getNmSubp())
             .family(offer.getFamily())
-            .subProductCode(subProduct != null ? subProduct.getCdSubp() : null)
-            .minApplicationValue(
-                convertToDouble(subProduct != null ? subProduct.getVlMiniApli() : null))
-            .minRedemptionValue(
-                convertToDouble(subProduct != null ? subProduct.getVlMiniResg() : null))
-            .minBalance(convertToDouble(subProduct != null ? subProduct.getVlMiniSald() : null))
+            .subProductCode(subProduct.getCdSubp())
+            .minApplicationValue(convertToDouble(subProduct.getVlMiniApli()))
+            .minRedemptionValue(convertToDouble(subProduct.getVlMiniResg()))
+            .minBalance(convertToDouble(subProduct.getVlMiniSald()))
             .build();
 
     log.info(
         "Mapeando oferta do Cosmos: ID={}, Produto={}, SubProduto={}, Código SubProduto={}, Aplicação Mínima={}, Resgate Mínimo={}, Saldo Mínimo={}",
-        response.getId(),
+        response.getIdAdapter(),
         response.getProduct(),
         response.getSubProduct(),
         response.getSubProductCode(),

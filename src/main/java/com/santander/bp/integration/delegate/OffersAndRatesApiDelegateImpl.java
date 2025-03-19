@@ -8,11 +8,13 @@ import org.springframework.stereotype.Service;
 
 import com.santander.bp.api.OffersAndRatesApiDelegate;
 import com.santander.bp.exception.RestApiException;
+import com.santander.bp.model.ErrorLevel;
 import com.santander.bp.model.Errors;
-import com.santander.bp.model.ErrorLevel; 
 import com.santander.bp.model.OffersPricingRequest;
+import com.santander.bp.model.PricingRequest;
 import com.santander.bp.model.ResponseWrapper;
 import com.santander.bp.service.OffersProcessingService;
+import com.santander.bp.service.PricingProcessingService;
 import com.santander.bp.util.ErrorBuilderUtil;
 import com.santander.bp.util.ResponseBuilderUtil;
 
@@ -23,9 +25,12 @@ import lombok.extern.slf4j.Slf4j;
 public class OffersAndRatesApiDelegateImpl implements OffersAndRatesApiDelegate {
 
     private final OffersProcessingService offersProcessingService;
+    private final PricingProcessingService pricingProcessingService;
 
-    public OffersAndRatesApiDelegateImpl(OffersProcessingService offersProcessingService) {
+    public OffersAndRatesApiDelegateImpl(OffersProcessingService offersProcessingService,
+                                         PricingProcessingService pricingProcessingService) {
         this.offersProcessingService = offersProcessingService;
+        this.pricingProcessingService = pricingProcessingService;
     }
 
     @Override
@@ -34,6 +39,24 @@ public class OffersAndRatesApiDelegateImpl implements OffersAndRatesApiDelegate 
         log.info("Recebendo requisição no offersPost: {}", request);
 
         return offersProcessingService.processOffers(request)
+                .thenApply(responseList -> {
+                    ResponseWrapper responseWrapper = new ResponseWrapper();
+                    responseWrapper.setData(responseList);
+
+                    long totalTime = System.currentTimeMillis();
+                    log.info("Tempo total de processamento: {} ms", (totalTime - startTime));
+
+                    return ResponseEntity.ok(responseWrapper);
+                })
+                .exceptionally(ex -> handleException(ex));
+    }
+
+    @Override
+    public CompletableFuture<ResponseEntity<ResponseWrapper>> pricingPost(PricingRequest request) {
+        long startTime = System.currentTimeMillis();
+        log.info("Recebendo requisição no pricingPost: {}", request);
+
+        return pricingProcessingService.processPricing(request)
                 .thenApply(responseList -> {
                     ResponseWrapper responseWrapper = new ResponseWrapper();
                     responseWrapper.setData(responseList);
@@ -59,7 +82,7 @@ public class OffersAndRatesApiDelegateImpl implements OffersAndRatesApiDelegate 
             return ResponseBuilderUtil.buildErrorResponse(errorResponse, restApiException.getHttpStatus());
         }
 
-        log.error("Erro inesperado no offersPost: {}", ex.getMessage(), ex);
+        log.error("Erro inesperado na API: {}", ex.getMessage(), ex);
         Errors errorResponse = ErrorBuilderUtil.buildServerError(ex.getMessage());
         return ResponseBuilderUtil.buildErrorResponse(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
