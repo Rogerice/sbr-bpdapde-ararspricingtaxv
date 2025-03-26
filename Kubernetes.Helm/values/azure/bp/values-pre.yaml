@@ -85,7 +85,7 @@ env:
   - name: ALTAIR_MQ_QUEUE_SERVER_PORT
     value: "1414"
   - name: altair-azure
-	value: "/app/configs/altair.yml"
+    value: "/app/configs/altair.yml"
   - name: HOST_RHSSO
     value: "https://login.azure.paas.santanderbr.pre.corp"
   - name: RHSSO_REALM
