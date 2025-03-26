@@ -23,7 +23,6 @@ public class PricingProcessingService {
         () -> {
           log.info("Processando precificação para o request: {}", request);
 
-          // Simulação de cálculo de precificação (Mock)
           List<OffersPricingResponse> response = pricingMapper.mapToOffersPricingResponse(request);
 
           log.info("Resposta do Pricing gerada: {}", response);

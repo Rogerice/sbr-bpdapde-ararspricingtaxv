@@ -25,10 +25,8 @@ public class PricingMapper {
   private OffersPricingResponse buildResponse(
       PricingRequestProposalsInner proposal, PricingRequest request) {
 
-    // ✅ Agora baseRate é um BigDecimal desde o início!
     BigDecimal baseRate = generateRate(proposal.getIndexType(), proposal.getTotalTerm());
 
-    // Gerando as taxas progressivas
     List<OffersPricingResponseRateTermInner> rateTerms =
         proposal.getProgressiveTerms().stream()
             .map(
@@ -36,8 +34,7 @@ public class PricingMapper {
                     new OffersPricingResponseRateTermInner(
                         term.intValue(),
                         formatDecimal(baseRate.add(adjustProgressiveRate(term.intValue())))
-                            .doubleValue() // 🔹 Conversão para Double
-                        ))
+                            .doubleValue()))
             .collect(Collectors.toList());
 
     return OffersPricingResponse.builder()
@@ -46,16 +43,15 @@ public class PricingMapper {
         .product(proposal.getProduct())
         .subProduct(proposal.getSubProduct())
         .family(proposal.getIndexType())
-        .rate(rateTerms.get(0).getRate()) // Primeira taxa progressiva
+        .rate(rateTerms.get(0).getRate())
         .rateTerm(rateTerms)
         .term(proposal.getTotalTerm() != null ? proposal.getTotalTerm().intValue() : null)
         .voucher(request.getVoucher())
-        .funding(calculateFunding(request.getAppliedAmount())) // Agora baseado no investimento
+        .funding(calculateFunding(request.getAppliedAmount()))
         .reason("Simulação de pricing mockada")
         .build();
   }
 
-  // ✅ Agora retorna BigDecimal diretamente!
   private BigDecimal generateRate(String indexType, BigDecimal totalTerm) {
     BigDecimal baseRateCDI = BigDecimal.valueOf(12.0);
     BigDecimal baseRateIPCA = BigDecimal.valueOf(6.0);
@@ -69,35 +65,31 @@ public class PricingMapper {
     } else if ("PRE".equalsIgnoreCase(indexType)) {
       rate = baseRatePRE.add(BigDecimal.valueOf(RANDOM.nextDouble() * 3));
     } else {
-      rate = BigDecimal.valueOf(10.0); // Default
+      rate = BigDecimal.valueOf(10.0);
     }
 
-    // Ajuste pela duração do investimento
     if (totalTerm != null && totalTerm.compareTo(BigDecimal.valueOf(180)) > 0) {
-      rate = rate.add(BigDecimal.valueOf(0.5)); // Pequeno bônus para investimentos mais longos
+      rate = rate.add(BigDecimal.valueOf(0.5));
     }
 
     return rate;
   }
 
-  // Ajuste das taxas progressivas
   private BigDecimal adjustProgressiveRate(Integer term) {
     if (term <= 90) {
-      return BigDecimal.valueOf(-0.2); // Menor tempo → taxa menor
+      return BigDecimal.valueOf(-0.2);
     } else if (term <= 180) {
-      return BigDecimal.ZERO; // Neutro
+      return BigDecimal.ZERO;
     } else {
-      return BigDecimal.valueOf(0.3); // Prazos mais longos → taxa maior
+      return BigDecimal.valueOf(0.3);
     }
   }
 
-  // Cálculo do funding baseado no valor aplicado
   private BigDecimal calculateFunding(BigDecimal appliedAmount) {
     BigDecimal multiplier = BigDecimal.valueOf(0.98 + RANDOM.nextDouble() * 0.04);
-    return formatDecimal(appliedAmount.multiply(multiplier)); // Simula um custo de funding variável
+    return formatDecimal(appliedAmount.multiply(multiplier));
   }
 
-  // Método para formatar decimais com 3 casas
   private BigDecimal formatDecimal(BigDecimal value) {
     return value.setScale(3, RoundingMode.HALF_UP);
   }
