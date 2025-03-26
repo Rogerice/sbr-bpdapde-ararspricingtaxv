@@ -25,7 +25,7 @@ class PricingEngineServiceTest {
     // Criando oferta simulada
     OffersPricingResponse originalOffer =
         OffersPricingResponse.builder()
-            .id("123")
+            .idAdapter("123")
             .product("Investment")
             .subProductCode("SP001")
             .subProduct("Fixed Income")
@@ -44,12 +44,12 @@ class PricingEngineServiceTest {
     assertEquals(1, enrichedOffers.size());
 
     OffersPricingResponse enrichedOffer = enrichedOffers.iterator().next();
-    assertEquals("123", enrichedOffer.getId());
+    assertEquals("123", enrichedOffer.getIdAdapter());
     assertEquals("Investment", enrichedOffer.getProduct());
     assertNotNull(enrichedOffer.getRateTerm());
     assertEquals(2, enrichedOffer.getRateTerm().size());
-    assertNotNull(enrichedOffer.getCampaign());
-    assertEquals("Mocked Pricing - BP", enrichedOffer.getCampaign());
+    assertNotNull(enrichedOffer.getVoucher());
+    assertEquals("Mocked Pricing - BP", enrichedOffer.getVoucher());
   }
 
   @Test

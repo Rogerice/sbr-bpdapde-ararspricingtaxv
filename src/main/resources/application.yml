@@ -42,7 +42,7 @@ info:
     java.version: "17.0.7"
 
 server:
-  port: ${SERVER_PORT:8080}  # Porta padrão
+  port: 8080  # Porta padrão
   servlet:
     encoding:
       charset: UTF-8
