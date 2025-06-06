@@ -58,11 +58,10 @@ public class PricingResponseMapper {
                                       // avisou aqui
                                       .rate(
                                           Double.parseDouble(
-                                              tier
-                                                  .getAprPeriodInterest())) // parseDouble é o mais
-                                                                            // comum, e autoboxing
-                                                                            // ocorrerá para o
-                                                                            // Double do RateTerm
+                                              tier.getAprPeriodInterest())) // parseDouble é o mais
+                                      // comum, e autoboxing
+                                      // ocorrerá para o
+                                      // Double do RateTerm
                                       .build())
                           .collect(Collectors.toList());
                 }
@@ -117,9 +116,8 @@ public class PricingResponseMapper {
                         .term(tier.getTerm().getDays())
                         .rate(
                             Double.parseDouble(
-                                tier
-                                    .getAprPeriodInterest())) // Sonar avisou aqui, mas está ok para
-                                                              // Double.
+                                tier.getAprPeriodInterest())) // Sonar avisou aqui, mas está ok para
+                        // Double.
                         .build();
                 rateTerms.add(rateTerm);
               }
