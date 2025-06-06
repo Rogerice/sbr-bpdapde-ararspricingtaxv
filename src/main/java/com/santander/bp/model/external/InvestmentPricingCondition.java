@@ -1,0 +1,10 @@
+package com.santander.bp.model.external;
+
+import lombok.Data;
+
+@Data
+public class InvestmentPricingCondition {
+  private Product product;
+  private BenchmarkIndex benchmarkIndex;
+  private PromotionalCode promotionalCode;
+}

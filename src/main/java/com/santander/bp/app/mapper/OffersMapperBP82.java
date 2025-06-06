@@ -6,7 +6,7 @@ import com.altec.bsbr.fw.ps.parser.object.PsScreen;
 import com.santander.bp.enums.FixedFieldsEnum;
 import com.santander.bp.model.OffersPricingRequest;
 import com.santander.bp.model.OffersPricingResponse;
-import com.santander.bp.model.OffersPricingResponseRateTermInner;
+import com.santander.bp.model.RateTerm;
 import com.santander.bp.model.altair.BPMP82;
 import com.santander.bp.model.altair.BPMP820;
 import java.util.ArrayList;
@@ -131,9 +131,9 @@ public class OffersMapperBP82 {
     return messages.isEmpty() ? null : messages;
   }
 
-  private List<OffersPricingResponseRateTermInner> buildRateDetails(BPMP820 bpmp820) {
+  private List<RateTerm> buildRateDetails(BPMP820 bpmp820) {
     Set<String> uniqueRates = new HashSet<>();
-    List<OffersPricingResponseRateTermInner> rateDetailsList = new ArrayList<>();
+    List<RateTerm> rateDetailsList = new ArrayList<>();
 
     addRateDetailIfValid(uniqueRates, rateDetailsList, bpmp820.getPRAZO1(), bpmp820.getTAXAENC());
     addRateDetailIfValid(uniqueRates, rateDetailsList, bpmp820.getPRAZO2(), bpmp820.getTAXAENC());
@@ -141,23 +141,21 @@ public class OffersMapperBP82 {
     addRateDetailIfValid(uniqueRates, rateDetailsList, bpmp820.getPRZMIN(), bpmp820.getTAXAENC());
     addRateDetailIfValid(uniqueRates, rateDetailsList, bpmp820.getPRZMAX(), bpmp820.getTAXAENC());
 
-    rateDetailsList.sort(Comparator.comparingInt(OffersPricingResponseRateTermInner::getTerm));
+    rateDetailsList.sort(Comparator.comparingInt(RateTerm::getTerm));
 
     return rateDetailsList.isEmpty() ? null : rateDetailsList;
   }
 
   private void addRateDetailIfValid(
-      Set<String> uniqueRates,
-      List<OffersPricingResponseRateTermInner> rateDetailsList,
-      Integer term,
-      double rate) {
+      Set<String> uniqueRates, List<RateTerm> rateDetailsList, Integer term, double rate) {
+
     if (term != null && term > 0) {
       String uniqueKey = term + "-" + rate;
       if (!uniqueRates.contains(uniqueKey)) {
         uniqueRates.add(uniqueKey);
-        OffersPricingResponseRateTermInner rateDetail = new OffersPricingResponseRateTermInner();
+        RateTerm rateDetail = new RateTerm();
         rateDetail.setTerm(term);
-        rateDetail.setRate(safeConvertDouble(rate));
+        rateDetail.setRate(rate);
         rateDetailsList.add(rateDetail);
       }
     }

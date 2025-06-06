@@ -1,5 +1,7 @@
 package com.santander.bp.integration.delegate;
 
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+
 import java.util.concurrent.CompletableFuture;
 
 import org.springframework.http.HttpStatus;
@@ -11,10 +13,8 @@ import com.santander.bp.exception.RestApiException;
 import com.santander.bp.model.ErrorLevel;
 import com.santander.bp.model.Errors;
 import com.santander.bp.model.OffersPricingRequest;
-import com.santander.bp.model.PricingRequest;
 import com.santander.bp.model.ResponseWrapper;
 import com.santander.bp.service.OffersProcessingService;
-import com.santander.bp.service.PricingProcessingService;
 import com.santander.bp.util.ErrorBuilderUtil;
 import com.santander.bp.util.ResponseBuilderUtil;
 
@@ -25,12 +25,9 @@ import lombok.extern.slf4j.Slf4j;
 public class OffersAndRatesApiDelegateImpl implements OffersAndRatesApiDelegate {
 
     private final OffersProcessingService offersProcessingService;
-    private final PricingProcessingService pricingProcessingService;
 
-    public OffersAndRatesApiDelegateImpl(OffersProcessingService offersProcessingService,
-                                         PricingProcessingService pricingProcessingService) {
+    public OffersAndRatesApiDelegateImpl(OffersProcessingService offersProcessingService) {
         this.offersProcessingService = offersProcessingService;
-        this.pricingProcessingService = pricingProcessingService;
     }
 
     @Override
@@ -51,23 +48,6 @@ public class OffersAndRatesApiDelegateImpl implements OffersAndRatesApiDelegate 
                 .exceptionally(ex -> handleException(ex));
     }
 
-    @Override
-    public CompletableFuture<ResponseEntity<ResponseWrapper>> pricingPost(PricingRequest request) {
-        long startTime = System.currentTimeMillis();
-        log.info("Recebendo requisição no pricingPost: {}", request);
-
-        return pricingProcessingService.processPricing(request)
-                .thenApply(responseList -> {
-                    ResponseWrapper responseWrapper = new ResponseWrapper();
-                    responseWrapper.setData(responseList);
-
-                    long totalTime = System.currentTimeMillis();
-                    log.info("Tempo total de processamento: {} ms", (totalTime - startTime));
-
-                    return ResponseEntity.ok(responseWrapper);
-                })
-                .exceptionally(ex -> handleException(ex));
-    }
 
     private ResponseEntity<ResponseWrapper> handleException(Throwable ex) {
         if (ex.getCause() instanceof RestApiException restApiException) {

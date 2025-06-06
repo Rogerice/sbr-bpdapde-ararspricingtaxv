@@ -48,7 +48,6 @@ class CosmosDbMapperTest {
     OffersPricingResponse response = cosmosDbMapper.mapToOfferResponseDTO(offer, bestSubProduct);
 
     assertNotNull(response);
-    assertEquals("ID_1", response.getIdAdapter());
     assertEquals("Product A", response.getProduct());
     assertEquals("Sub A1", response.getSubProduct());
     assertEquals(100.0, response.getMinApplicationValue());

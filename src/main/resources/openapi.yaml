@@ -52,320 +52,75 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Errors'
-              example:
-                errors:
-                  - code: "ERR007"
-                    message: "Service unavailable"
-                    level: "error"
-                    description: "The service is temporarily unavailable."
         '504':
           description: "Gateway timeout."
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Errors'
-              example:
-                errors:
-                  - code: "ERR008"
-                    message: "Gateway timeout"
-                    level: "error"
-  /pricing:
-    post:
-      tags:
-        - Offers and Rates
-      summary: "Fetch pricing details for fixed income investment offers."
-      description: "This endpoint retrieves pricing details for investment offers, including customer-specific conditions."
-      requestBody:
-        description: "Data required to fetch pricing details for offers"
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/PricingRequest'
-        required: true
-      responses:
-        '200':
-          description: "Successful retrieval of pricing details"
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ResponseWrapper'
-        '400':
-          description: "Bad Request"
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Errors'
-        '500':
-          description: "Internal Server Error"
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Errors'
 components:
   schemas:
-
-
     OffersPricingRequest:
       type: object
       required:
         - documentType
-        - customerId
         - documentNumber
+        - customerId
+        - segment
+        - channel
       properties:
         documentType:
           type: string
-          description: "Document type."
           example: "CPF"
         customerId:
           type: string
-          description: "Customer ID."
           example: "123456"
         documentNumber:
           type: string
-          description: "Document number."
           example: "34034505445"
         segment:
           type: string
-          description: "Customer market segment."
           example: "12"
         channel:
           type: string
-          description: "Request channel."
           example: "77"
         centerId:
           type: string
-          description: "Center ID (Agency)."
           example: "0025"
         productFamily:
           type: string
-          description: "Product family name (e.g., CDB)."
           example: "CDB"
         indicatorRecall:
           type: string
-          description: "Indicator of realization (Indicador de Rechamada)."
           example: "Y"
         cdRecall:
           type: string
-          description: "Real product code (Código do Produto da Rechamada)."
           example: "26"
         subProductRecall:
           type: string
-          description: "Real subproduct code (Código do Subproduto da Rechamada)."
           example: "0103"
         funcType:
           type: string
-          description: "Type of functionality for Application or Rescue"
           example: "R"
         subProduct:
           type: string
-          description: "By-product chosen in the offer"
           example: "LCI - Invest"
-          
-    PricingRequest:
-      type: object
-      required:
-        - channel
-        - company
-        - customerData
-        - system
-        - pricingType
-        - segment
-        - currency
-        - appliedAmount
-        - proposals
-      properties:
-        channel:
+        companyCode:
           type: string
-          description: "Código do canal de chamada."
-          example: "52"
-        company:
+          example: "033"
+          description: "Código da empresa (ex: Santander = 033)."
+        creationApp:
           type: string
-          description: "Código da empresa que está acessando a API para retornar o preço."
-          example: "0033"
-        customerData:
-          type: object
-          required:
-            - documentType
-            - documentNumber
-          properties:
-            documentType:
-              type: number
-              description: "Tipo de documento do cliente (1: PF, 2: PJ)."
-              example: 1
-            documentNumber:
-              type: string
-              description: "Número do documento (CPF ou CNPJ)."
-              example: "12345678900"
-            penumperCode:
-              type: string
-              description: "Código Penumper do cliente cadastrado."
-              example: "PEN123456"
-        voucher:
-          type: string
-          description: "Voucher promocional para flexibilização de preço."
-          example: "PROMO2024"
-        system:
-          type: string
-          description: "Código do sistema que está chamando a API."
           example: "BP"
-        pricingType:
+          description: "Sistema de origem da requisição."
+        pricingTypeCode:
           type: string
-          description: "Tipo de chamada de precificação (R1 ou R2)."
           example: "R1"
-        segment:
+          description: "Tipo de precificação (ex: R1, R2)."
+        currencyCode:
           type: string
-          description: "Código do segmento do cliente cadastrado (3 dígitos)."
-          example: "ALL"
-        currency:
-          type: string
-          description: "Código da moeda em que o valor da receita será ofertada."
           example: "BRL"
-        appliedAmount:
-          type: number
-          description: "Valor da aplicação no produto."
-          example: 10000
-        proposals:
-          type: array
-          description: "Lista de propostas enviadas pelo sistema produto."
-          items:
-            type: object
-            required:
-              - idSystem
-              - product
-              - indexType
-              - subProduct
-              - totalTerm
-            properties:
-              idSystem:
-                type: number
-                description: "Identificação de cotação, gerado pelo sistema de chamada."
-                example: 123456
-              product:
-                type: string
-                description: "Nome do produto."
-                example: "CDB"
-              indexType:
-                type: string
-                description: "Tipo de indexador (CDI, IPCA, PRE, PROG)."
-                example: "CDI"
-              subProduct:
-                type: string
-                description: "Código do subproduto."
-                example: "0013"
-              totalTerm:
-                type: number
-                description: "Valor do prazo total do período de investimento."
-                example: 365
-              progressiveTerms:
-                type: array
-                description: "Lista de números inteiros dos prazos a serem precificados."
-                items:
-                  type: number
-                example: [30, 60, 90]
-              gracePeriod:
-                type: number
-                description: "Valor do prazo de carência."
-                example: 90
-    OffersPricingResponse:
-      type: object
-      description: "Response object containing investment offer details and pricing information."
-      properties:
-        idAdapter:
-          type: string
-          description: "Adapter identifier, generated by the pricing process."
-          example: "ADP123456"
-        idPricingPolicy:
-          type: string
-          description: "Unique identifier for the pricing policy applied to each proposal."
-          example: "PREC-001"
-        product:
-          type: string
-          description: "Investment product name."
-          example: "CDB"
-        subProductCode:
-          type: string
-          description: "Investment sub-product code."
-          example: "0003"
-        subProduct:
-          type: string
-          description: "Investment sub-product description."
-          example: "LCI - Invest"
-        family:
-          type: string
-          description: "Family code of the investment product."
-          example: "CDB"
-        term:
-          type: integer
-          description: "Investment term in days."
-          example: 365
-        rate:
-          type: number
-          format: double
-          description: "Rate applied to the investment offer."
-          example: 12.50
-        rateTerm:
-          type: array
-          description: "List of applicable rates and their respective terms."
-          items:
-            type: object
-            properties:
-              term:
-                type: integer
-                description: "Term in days."
-                example: 180
-              rate:
-                type: number
-                format: double
-                description: "Rate applied for this term."
-                example: 11.75
-        minApplicationValue:
-          type: number
-          format: double
-          description: "Minimum investment amount required."
-          example: 1000.00
-        minRedemptionValue:
-          type: number
-          format: double
-          description: "Minimum amount allowed for redemption."
-          example: 500.00
-        minBalance:
-          type: number
-          format: double
-          description: "Minimum balance required after redemption."
-          example: 100.00
-        closingFee:
-          type: number
-          format: double
-          description: "Encumbrance fee applied to the offer."
-          example: 0.5
-        receivingFee:
-          type: number
-          format: double
-          description: "Fee applied when receiving the investment."
-          example: 0.3
-        feeDescription:
-          type: string
-          description: "Description of the fees applied."
-          example: "Management and custody fees."
-        voucher:
-          type: string
-          description: "Associated investment campaign, if applicable."
-          example: "High-Yield Bonds Promo"
-        funding:
-          type: string
-          format: decimal
-          description: "Total funding allocated to this investment offer, ensuring precision."
-          example: "5000000.00"
-        reason:
-          type: string
-          description: "Reason associated with the offer."
-          example: "Special Promotion"
-        messages:
-          type: array
-          description: "List of additional messages related to the offer."
-          items:
-            type: string
-          example: ["Limited-time offer", "Available for VIP customers only"]
+          description: "Código da moeda."
     ResponseWrapper:
       type: object
       properties:
@@ -373,25 +128,153 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/OffersPricingResponse'
-          description: "List of offers and pricing responses"
         errors:
           type: array
           items:
             $ref: '#/components/schemas/Error'
           description: "List of errors"
           example: []
+    OffersPricingResponse:
+      type: object
+      properties:
+        product:
+          type: string
+          example: "26"
+        subProductCode:
+          type: string
+          example: "0413"
+        subProduct:
+          type: string
+          example: "LCI 90 DIAS"
+        family:
+          type: string
+          example: "LCI"
+        term:
+          type: integer
+          example: 0
+        rateTerm:
+          type: array
+          items:
+            $ref: '#/components/schemas/RateTerm'
+        minApplicationValue:
+          type: number
+          format: double
+          example: 1000.0
+        minRedemptionValue:
+          type: number
+          format: double
+          example: 100.0
+        minBalance:
+          type: number
+          format: double
+          example: 100.0
+        closingFee:
+          type: number
+          format: double
+          example: 88.89
+        receivingFee:
+          type: number
+          format: double
+          example: 105.0
+        feeDescription:
+          type: string
+          example: "88,89% do CDI"
+        indexType:
+          type: string
+          example: "CDI"
+        benchmarkIndex:
+          type: string
+          example: "FM9"
+        gracePeriodIndicator:
+          type: boolean
+          example: true
+        progressiveRemunerationIndicator:
+          type: boolean
+          example: false
+        promotionalCode:
+          type: string
+          example: "PRM001"
+        Messages:
+          type: array
+          items:
+            type: string
+          example: ["Taxa fora do intervalo", "Cliente na whitelist"]
+        investmentPriceProposals:
+          type: array
+          items:
+            $ref: '#/components/schemas/InvestmentPriceProposal'
+    RateTerm:
+      type: object
+      properties:
+        term:
+          type: integer
+          example: 90
+        rate:
+          type: number
+          format: double
+          example: 88.89
+    InvestmentPriceProposal:
+      type: object
+      properties:
+        price:
+          type: object
+          properties:
+            code:
+              type: integer
+              example: 1234
+            priceConceptId:
+              type: string
+              example: "PCID001"
+            tiers:
+              type: array
+              items:
+                type: object
+                properties:
+                  termInDays:
+                    type: integer
+                    example: 90
+                  aprPercentage:
+                    type: string
+                    example: "88.89"
+        product:
+          type: object
+          properties:
+            name:
+              type: string
+              example: "LCI 90 DIAS"
+            subproduct:
+              type: object
+              properties:
+                code:
+                  type: string
+                  example: "0413"
+        benchmarkIndex:
+          type: object
+          properties:
+            code:
+              type: string
+              example: "CDI"
+        fundingRate:
+          type: number
+          example: 10.5
+        reason:
+          type: string
+          example: "Campanha promocional"
+        promotionalCode:
+          type: object
+          properties:
+            promotionId:
+              type: string
+              example: "PROMO2025"
     Errors:
       type: object
-      description: "Data structure containing the details for errors."
       properties:
         errors:
           type: array
           items:
             $ref: '#/components/schemas/Error'
-          description: "Array of errors."
     Error:
       type: object
-      description: "Data structure containing the error details."
       required:
         - code
         - message
@@ -399,110 +282,19 @@ components:
       properties:
         code:
           type: string
-          description: "Unique alphanumeric human-readable error code."
           example: "ERR001"
         message:
           type: string
-          description: "Brief summary of the reported issue."
           example: "Invalid Action"
         level:
           $ref: '#/components/schemas/ErrorLevel'
         description:
           type: string
-          description: "Detailed description of the reported issue."
           example: "The request parameter is invalid."
     ErrorLevel:
       type: string
-      description: "Level of the reported issue."
       enum:
         - INFO
         - WARNING
         - ERROR
       example: "ERROR"
-  responses:
-    NoContent:
-      description: "No content."
-    Unauthorized:
-      description: "Unauthorized."
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Errors'
-          example:
-            errors:
-              - code: "ERR002"
-                message: "Unauthorized access"
-                level: "error"
-                description: "You do not have permission to access this resource."
-    Forbidden:
-      description: "Forbidden."
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Errors'
-          example:
-            errors:
-              - code: "ERR003"
-                message: "Forbidden access"
-                level: "error"
-                description: "Access to this resource is forbidden."
-    BadRequest:
-      description: "Bad Request."
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Errors'
-          example:
-            errors:
-              - code: "ERR004"
-                message: "Invalid request"
-                level: "error"
-                description: "The request parameters are invalid."
-    NotFound:
-      description: "Not Found."
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Errors'
-          example:
-            errors:
-              - code: "ERR005"
-                message: "Resource not found"
-                level: "error"
-                description: "The requested resource was not found."
-    InternalServerError:
-      description: "Server Error."
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Errors'
-          example:
-            errors:
-              - code: "ERR006"
-                message: "Internal server error"
-                level: "error"
-                description: "An unexpected error occurred on the server."
-    ServiceUnavailable:
-      description: "Service Unavailable."
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Errors'
-          example:
-            errors:
-              - code: "ERR007"
-                message: "Service unavailable"
-                level: "error"
-                description: "The service is temporarily unavailable."
-    GatewayTimeout:
-      description: "Gateway timeout."
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Errors'
-          example:
-            errors:
-              - code: "ERR008"
-                message: "Gateway timeout"
-                level: "error"
-                description: "The request timed out while waiting for a response."

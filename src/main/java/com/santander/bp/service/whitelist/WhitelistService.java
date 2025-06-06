@@ -20,7 +20,7 @@ public class WhitelistService {
   }
 
   /**
-   * Verifica se um documento está na whitelist.
+   * a Verifica se um documento está na whitelist.
    *
    * @param documentType Tipo de documento (CPF ou CNPJ).
    * @param documentNumber Número do documento.

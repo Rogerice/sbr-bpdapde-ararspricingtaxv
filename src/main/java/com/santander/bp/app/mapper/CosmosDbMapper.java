@@ -23,27 +23,36 @@ public class CosmosDbMapper {
 
   public OffersPricingResponse mapToOfferResponseDTO(
       OfferCosmosDTO offer, SubProductCosmosDTO subProduct) {
+
     OffersPricingResponse response =
         OffersPricingResponse.builder()
-            .idAdapter(offer.getId())
+            //  --- Mapeamentos básicos ---
             .product(offer.getProduct())
             .subProduct(subProduct.getNmSubp())
             .family(offer.getFamily())
             .subProductCode(subProduct.getCdSubp())
+
+            // --- Mapeamentos de valores ---
             .minApplicationValue(convertToDouble(subProduct.getVlMiniApli()))
             .minRedemptionValue(convertToDouble(subProduct.getVlMiniResg()))
             .minBalance(convertToDouble(subProduct.getVlMiniSald()))
+
+            // --- Mapeamentos de campos adicionais do Cosmos ---
+            .benchmarkIndex(subProduct.getDsIndx()) // Mapeado de 'DS_INDX'
+            .gracePeriodIndicator(
+                "S".equalsIgnoreCase(subProduct.getInCare())) // Mapeado de 'IN_CARE'
+            .progressiveRemunerationIndicator(
+                "S".equalsIgnoreCase(subProduct.getInRemuPgre())) // Mapeado de 'IN_REMU_PGRE'
             .build();
 
     log.info(
-        "Mapeando oferta do Cosmos: ID={}, Produto={}, SubProduto={}, Código SubProduto={}, Aplicação Mínima={}, Resgate Mínimo={}, Saldo Mínimo={}",
-        response.getIdAdapter(),
+        "Mapeando oferta do Cosmos: OfferId={}, Product={}, SubProductCode={}, Benchmark={}, GracePeriod={}, ProgRemun={}",
+        offer.getId(),
         response.getProduct(),
-        response.getSubProduct(),
         response.getSubProductCode(),
-        response.getMinApplicationValue(),
-        response.getMinRedemptionValue(),
-        response.getMinBalance());
+        response.getBenchmarkIndex(),
+        response.isGracePeriodIndicator(),
+        response.isProgressiveRemunerationIndicator());
 
     return response;
   }
@@ -56,7 +65,6 @@ public class CosmosDbMapper {
 
     log.info(
         "Subprodutos disponíveis para a oferta ID {}: {}", offer.getId(), offer.getSubProducts());
-
     return offer.getSubProducts().stream()
         .min(
             (s1, s2) ->
@@ -68,9 +76,7 @@ public class CosmosDbMapper {
 
   protected Double convertToDouble(Integer value) {
     Double result = (value != null) ? value.doubleValue() : null;
-
     log.debug("Convertendo Integer para Double: Entrada={}, Saída={}", value, result);
-
     return result;
   }
 }
