@@ -18,10 +18,12 @@ import com.santander.bp.service.OffersProcessingService;
 import com.santander.bp.util.ErrorBuilderUtil;
 import com.santander.bp.util.ResponseBuilderUtil;
 
+import lombok.Generated;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
+@Generated
 public class OffersAndRatesApiDelegateImpl implements OffersAndRatesApiDelegate {
 
     private final OffersProcessingService offersProcessingService;

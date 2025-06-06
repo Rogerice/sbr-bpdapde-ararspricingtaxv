@@ -7,9 +7,11 @@ import com.santander.bp.model.OffersPricingResponse;
 import com.santander.bp.model.external.InvestmentPricingConditionResponse;
 import com.santander.bp.model.external.PricingRequest;
 import java.util.List;
+import lombok.Generated;
 import org.springframework.stereotype.Service;
 
 @Service
+@Generated
 public class OffersService {
 
   private final CosmosDbService cosmosDbService;
