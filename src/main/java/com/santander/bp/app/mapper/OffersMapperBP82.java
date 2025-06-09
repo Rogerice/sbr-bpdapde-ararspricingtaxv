@@ -6,6 +6,7 @@ import com.altec.bsbr.fw.ps.parser.object.PsScreen;
 import com.santander.bp.enums.FixedFieldsEnum;
 import com.santander.bp.model.OffersPricingRequest;
 import com.santander.bp.model.OffersPricingResponse;
+import com.santander.bp.model.OffersPricingResponseLegacyFlags;
 import com.santander.bp.model.RateTerm;
 import com.santander.bp.model.altair.BPMP82;
 import com.santander.bp.model.altair.BPMP820;
@@ -105,13 +106,22 @@ public class OffersMapperBP82 {
     response.setClosingFee(safeConvertDouble(bpmp820.getTAXAENC()));
     response.setReceivingFee(safeConvertDouble(bpmp820.getTAXAREC()));
     response.setFeeDescription(bpmp820.getDESTAXA().trim());
+    response.setGracePeriod(bpmp820.getPRZCARE());
 
     response.setMessages(buildMessages(bpmp820));
 
     response.setRateTerm(buildRateDetails(bpmp820));
 
     response.setTerm(determineMainTerm(bpmp820));
+    OffersPricingResponseLegacyFlags legacyFlags = new OffersPricingResponseLegacyFlags();
 
+    legacyFlags.setOtrPraz(bpmp820.getOTRPRAZ());
+    legacyFlags.setInApli(bpmp820.getINAPLI());
+    legacyFlags.setInResg(bpmp820.getINRESG());
+    legacyFlags.setAgnFutu(bpmp820.getAGNFUTU());
+    legacyFlags.setAgnResg(bpmp820.getAGNRESG());
+    legacyFlags.setHronlin(bpmp820.getHRONLIN());
+    response.setLegacyFlags(legacyFlags);
     return response;
   }
 

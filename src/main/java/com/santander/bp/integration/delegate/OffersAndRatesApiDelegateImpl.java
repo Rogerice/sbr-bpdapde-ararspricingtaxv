@@ -1,7 +1,5 @@
 package com.santander.bp.integration.delegate;
 
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-
 import java.util.concurrent.CompletableFuture;
 
 import org.springframework.http.HttpStatus;

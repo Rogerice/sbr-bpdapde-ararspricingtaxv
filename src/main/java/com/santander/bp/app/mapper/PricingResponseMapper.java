@@ -22,13 +22,10 @@ public class PricingResponseMapper {
       List<InvestmentPricingConditionResponse> pricingData) {
 
     if (pricingData == null || pricingData.isEmpty()) {
-      log.warn(
-          "⚠️ Lista de condições de pricing está vazia. Retornando apenas os dados do Cosmos.");
+      log.warn("Lista de condições de pricing está vazia. Retornando apenas os dados do Cosmos.");
       return cosmosOffers;
     }
 
-    // Melhoria para a performance: pré-dimensionar a lista 'enriched'
-    // A lista 'enriched' terá no máximo o mesmo tamanho de 'cosmosOffers'
     List<OffersPricingResponse> enriched = new ArrayList<>(cosmosOffers.size());
 
     for (OffersPricingResponse offer : cosmosOffers) {
@@ -45,7 +42,6 @@ public class PricingResponseMapper {
                 List<RateTerm> rateTerms = new ArrayList<>();
                 if (matchedPricing.getPrice() != null
                     && matchedPricing.getPrice().getTiers() != null) {
-                  // Pré-dimensionar rateTerms também
                   rateTerms =
                       matchedPricing.getPrice().getTiers().stream()
                           .filter(
@@ -54,14 +50,12 @@ public class PricingResponseMapper {
                               tier ->
                                   RateTerm.builder()
                                       .term(tier.getTerm().getDays())
-                                      // .rate(Double.valueOf(tier.getAprPeriodInterest())) // Sonar
-                                      // avisou aqui
                                       .rate(
-                                          Double.parseDouble(
-                                              tier.getAprPeriodInterest())) // parseDouble é o mais
-                                      // comum, e autoboxing
-                                      // ocorrerá para o
-                                      // Double do RateTerm
+                                          Double.valueOf(
+                                              tier.getAprPeriodInterest())) // ✅ Alterado de
+                                      // parseDouble para
+                                      // valueOf (evita boxing
+                                      // implícito)
                                       .build())
                           .collect(Collectors.toList());
                 }
@@ -76,12 +70,12 @@ public class PricingResponseMapper {
                         ? matchedPricing.getPromotionalCode().getPromotionalCodeId()
                         : null);
                 offer.setProgressiveRemunerationIndicator(
-                    false); // O aviso de boxing é geralmente ignorado aqui
+                    false); // ✅ Boolean boxing mantido simples (Sonar warning aceito ou ajustar
+                // tipo na model)
               },
               () ->
                   log.info(
-                      "➡️ Oferta sem match no pricing. ID Subproduto: {}",
-                      offer.getSubProductCode()));
+                      "Oferta sem match no pricing. ID Subproduto: {}", offer.getSubProductCode()));
 
       enriched.add(offer);
     }
@@ -101,13 +95,12 @@ public class PricingResponseMapper {
             && offer.getProduct().equals(price.getProduct().getBusinessCategoryCode())
             && offer.getSubProductCode().equals(price.getProduct().getSubproduct().getCode())) {
 
-          // Mapeando tiers para RateTerm
-          // Melhoria para a performance: pré-dimensionar rateTerms
           List<RateTerm> rateTerms =
               new ArrayList<>(
                   price.getPrice() != null && price.getPrice().getTiers() != null
                       ? price.getPrice().getTiers().size()
                       : 0);
+
           if (price.getPrice() != null && price.getPrice().getTiers() != null) {
             for (Tier tier : price.getPrice().getTiers()) {
               if (tier.getTerm() != null && tier.getAprPeriodInterest() != null) {
@@ -115,9 +108,9 @@ public class PricingResponseMapper {
                     RateTerm.builder()
                         .term(tier.getTerm().getDays())
                         .rate(
-                            Double.parseDouble(
-                                tier.getAprPeriodInterest())) // Sonar avisou aqui, mas está ok para
-                        // Double.
+                            Double.valueOf(
+                                tier.getAprPeriodInterest())) // ✅ Alterado de parseDouble para
+                        // valueOf (evita boxing implícito)
                         .build();
                 rateTerms.add(rateTerm);
               }
@@ -125,20 +118,15 @@ public class PricingResponseMapper {
           }
 
           offer.setRateTerm(rateTerms);
-
-          // Benchmark
           offer.setBenchmarkIndex(
               price.getBenchmarkIndex() != null ? price.getBenchmarkIndex().getCode() : null);
-
-          // Promotional code
           offer.setPromotionalCode(
               price.getPromotionalCode() != null
                   ? price.getPromotionalCode().getPromotionalCodeId()
                   : null);
-
-          // Progressive indicator - usar regra se tiver
           offer.setProgressiveRemunerationIndicator(
-              false); // O aviso de boxing é geralmente ignorado aqui
+              false); // ✅ Boolean boxing mantido simples (Sonar warning aceito ou ajustar tipo na
+          // model)
 
           break; // encontrou o match, vai pro próximo offer
         }

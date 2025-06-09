@@ -188,13 +188,16 @@ components:
         gracePeriodIndicator:
           type: boolean
           example: true
+        gracePeriod:
+          format: integer
+          example: 12
         progressiveRemunerationIndicator:
           type: boolean
           example: false
         promotionalCode:
           type: string
           example: "PRM001"
-        Messages:
+        messages:
           type: array
           items:
             type: string
@@ -203,6 +206,27 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/InvestmentPriceProposal'
+        legacyFlags:
+          type: object
+          properties:
+            otrPraz:
+              type: string
+              example: "S"
+            inApli:
+              type: string
+              example: "S"
+            inResg:
+              type: string
+              example: "S"
+            agnFutu:
+              type: string
+              example: "S"
+            agnResg:
+              type: string
+              example: "S"
+            hronlin:
+              type: string
+              example: "20:10:00"
     RateTerm:
       type: object
       properties:
