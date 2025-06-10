@@ -5,11 +5,13 @@ import com.santander.bp.model.OffersPricingResponse;
 import com.santander.bp.model.SubProductCosmosDTO;
 import java.util.List;
 import java.util.stream.Collectors;
+import lombok.Generated;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
+@Generated
 public class CosmosDbMapper {
 
   public List<OffersPricingResponse> mapOffers(List<OfferCosmosDTO> offers) {
