@@ -69,9 +69,7 @@ public class PricingResponseMapper {
                     matchedPricing.getPromotionalCode() != null
                         ? matchedPricing.getPromotionalCode().getPromotionalCodeId()
                         : null);
-                offer.setProgressiveRemunerationIndicator(
-                    false); // ✅ Boolean boxing mantido simples (Sonar warning aceito ou ajustar
-                // tipo na model)
+                offer.setProgressiveRemunerationIndicator(Boolean.FALSE);
               },
               () ->
                   log.info(
@@ -124,8 +122,7 @@ public class PricingResponseMapper {
               price.getPromotionalCode() != null
                   ? price.getPromotionalCode().getPromotionalCodeId()
                   : null);
-          offer.setProgressiveRemunerationIndicator(
-              false); // ✅ Boolean boxing mantido simples (Sonar warning aceito ou ajustar tipo na
+          offer.setProgressiveRemunerationIndicator(Boolean.FALSE);
           // model)
 
           break; // encontrou o match, vai pro próximo offer
