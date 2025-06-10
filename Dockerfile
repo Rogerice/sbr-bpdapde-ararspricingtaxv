@@ -12,6 +12,8 @@ ARG BASE_URL=http://artifactory.santanderbr.corp/artifactory/raw-downloads
 
 ENV MAVEN_HOME /usr/share/maven
 ENV MAVEN_CONFIG "$USER_HOME_DIR/.m2"
+ENV JAVA_HOME=/usr/lib/jvm/java-17
+ENV PATH=$JAVA_HOME/bin:$PATH
 
 ARG APP_PATH
 WORKDIR $APP_PATH
