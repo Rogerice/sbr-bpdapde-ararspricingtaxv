@@ -14,8 +14,6 @@ import org.springframework.context.annotation.Configuration;
 @EnableCosmosRepositories(basePackages = "com.santander.bp.repository")
 public class AppCosmosDbConfiguration extends AbstractCosmosConfiguration {
 
-  // private static final Logger logger = LoggerFactory.getLogger(AppCosmosDbConfiguration.class);
-
   @Value("${azure.cosmos.uri}")
   private String uri;
 
@@ -27,9 +25,6 @@ public class AppCosmosDbConfiguration extends AbstractCosmosConfiguration {
 
   @Bean
   public CosmosClientBuilder cosmosClientBuilder() {
-    // logger.info("Configuring CosmosClientBuilder URI: {}", uri);
-    // logger.info("Database Name: {}", database);
-    // logger.info("KEY: {}", key);
     return new CosmosClientBuilder()
         .endpoint(uri)
         .key(key)

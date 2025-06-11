@@ -4,8 +4,10 @@ import com.altec.bsbr.fw.ps.annotations.PsFieldNumber;
 import com.altec.bsbr.fw.ps.annotations.PsFieldString;
 import com.altec.bsbr.fw.ps.annotations.PsFormat;
 import com.altec.bsbr.fw.ps.enums.PsAlign;
+import lombok.Generated;
 
 @PsFormat(name = "BPMP820")
+@Generated
 public class BPMP820 {
   @PsFieldString(name = "PRODUTO", length = 2, paddingAlign = PsAlign.LEFT, paddingChar = ' ')
   private String PRODUTO;

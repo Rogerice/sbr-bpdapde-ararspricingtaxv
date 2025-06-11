@@ -44,6 +44,7 @@ public class RestApiException extends RuntimeException {
     return title;
   }
 
+  @Override
   public String getMessage() {
     return message;
   }

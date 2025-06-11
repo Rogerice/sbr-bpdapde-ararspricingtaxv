@@ -15,6 +15,10 @@ public class ErrorBuilderUtil {
   private static final String ERROR_MSG_SERVER = "Internal Server Error";
   private static final String ERROR_MSG_NOT_FOUND = "No offers found";
 
+  private ErrorBuilderUtil() {
+    throw new UnsupportedOperationException("Utility class");
+  }
+
   /**
    * Método genérico para construir uma instância de Errors.
    *

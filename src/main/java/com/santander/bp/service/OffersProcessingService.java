@@ -7,12 +7,14 @@ import com.santander.bp.model.OffersPricingResponse;
 import com.santander.bp.service.whitelist.WhitelistService;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import lombok.Generated;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
+@Generated
 public class OffersProcessingService {
 
   private final OffersPricingServiceBP82 offersPricingServiceBP82;

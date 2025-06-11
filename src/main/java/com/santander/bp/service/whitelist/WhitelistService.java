@@ -3,12 +3,14 @@ package com.santander.bp.service.whitelist;
 import com.santander.bp.model.WhitelistDTO;
 import com.santander.bp.repository.WhitelistJpaRepository;
 import java.util.List;
+import lombok.Generated;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Generated
 public class WhitelistService {
 
   private static final Logger logger = LoggerFactory.getLogger(WhitelistService.class);

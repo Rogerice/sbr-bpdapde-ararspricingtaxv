@@ -11,6 +11,10 @@ import org.springframework.http.ResponseEntity;
 @Generated
 public class ResponseBuilderUtil {
 
+  private ResponseBuilderUtil() {
+    throw new UnsupportedOperationException("Utility class");
+  }
+
   public static ResponseEntity<ResponseWrapper> buildSuccessResponse(
       List<OffersPricingResponse> data) {
     ResponseWrapper responseWrapper = ResponseWrapper.builder().data(data).build();
