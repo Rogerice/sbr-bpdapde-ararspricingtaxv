@@ -16,12 +16,10 @@ import com.santander.bp.model.altair.BPMP82;
 
 import br.com.santander.ars.altair.config.ArsenalAltairConfig;
 import br.com.santander.ars.altair.core.facade.AltairStrategy;
-import lombok.Generated;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
-@Generated
 public class OffersPricingServiceBP82 extends AltairService {
 
 	private final OffersMapperBP82 offersMapperBP82;
