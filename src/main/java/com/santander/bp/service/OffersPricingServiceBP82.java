@@ -3,6 +3,7 @@ package com.santander.bp.service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
@@ -33,11 +34,8 @@ public class OffersPricingServiceBP82 extends AltairService {
 	public List<OffersPricingResponse> processOffers(OffersPricingRequest offersPricingRequest) {
 		List<OffersPricingResponse> acumulado = new ArrayList<>();
 		boolean precisaRecall;
-		String indRea;
-		String prodRea;
-		String subPrea;
-
 		int count = 1;
+
 		do {
 			log.info("[BP82] Rechamada #{} - Request: {}", count, offersPricingRequest);
 
@@ -50,39 +48,40 @@ public class OffersPricingServiceBP82 extends AltairService {
 			List<OffersPricingResponse> respostaAtual = offersMapperBP82.mapOffersResponseList(response);
 			acumulado.addAll(respostaAtual);
 
-			// Assume que só precisa de recall se INDREA vier "S"
-			indRea = null;
-			prodRea = null;
-			subPrea = null;
-			precisaRecall = false;
+			Optional<BPMP82> optRecallData = extractLastBpmp82From(response);
 
-			// Busca INDREA, PRODREA, SUBPREA do último formato
-			if (response.getObjeto() != null && response.getObjeto().getListaFormatos() != null
-					&& !response.getObjeto().getListaFormatos().isEmpty()) {
-				Object lastFormat = response.getObjeto().getListaFormatos()
-						.get(response.getObjeto().getListaFormatos().size() - 1);
-				if (lastFormat instanceof PsScreen psScreen && psScreen.getFormato() instanceof BPMP82 lastBpmp82) {
-					indRea = lastBpmp82.getINDREA();
-					prodRea = lastBpmp82.getPRODREA();
-					subPrea = lastBpmp82.getSUBPREA();
+			if (optRecallData.isPresent() && "S".equalsIgnoreCase(optRecallData.get().getINDREA())) {
+				precisaRecall = true;
+				offersPricingRequest.setIndicatorRecall(optRecallData.get().getINDREA());
+				offersPricingRequest.setCdRecall(optRecallData.get().getPRODREA());
+				offersPricingRequest.setSubProductRecall(optRecallData.get().getSUBPREA());
 
-					log.info("[BP82] Rechamada #{} - INDREA={}, PRODREA={}, SUBPREA={}", count, indRea, prodRea,
-							subPrea);
-
-					if ("S".equalsIgnoreCase(indRea)) {
-						precisaRecall = true;
-						// Atualiza request para a próxima chamada
-						offersPricingRequest.setIndicatorRecall(indRea);
-						offersPricingRequest.setCdRecall(prodRea);
-						offersPricingRequest.setSubProductRecall(subPrea);
-					}
-				}
+				log.info("[BP82] Rechamada #{} - INDREA={}, PRODREA={}, SUBPREA={}",
+						count, optRecallData.get().getINDREA(), optRecallData.get().getPRODREA(), optRecallData.get().getSUBPREA());
+			} else {
+				precisaRecall = false;
 			}
+
 			count++;
 		} while (precisaRecall);
 
 		log.info("[BP82] Total de rechamadas realizadas: {}", count - 1);
-
 		return acumulado;
+	}
+
+	private Optional<BPMP82> extractLastBpmp82From(ResponseDto response) {
+		if (response.getObjeto() == null || response.getObjeto().getListaFormatos() == null
+				|| response.getObjeto().getListaFormatos().isEmpty()) {
+			return Optional.empty();
+		}
+
+		Object lastFormat = response.getObjeto().getListaFormatos()
+				.get(response.getObjeto().getListaFormatos().size() - 1);
+
+		if (lastFormat instanceof PsScreen psScreen && psScreen.getFormato() instanceof BPMP82 lastBpmp82) {
+			return Optional.of(lastBpmp82);
+		}
+
+		return Optional.empty();
 	}
 }

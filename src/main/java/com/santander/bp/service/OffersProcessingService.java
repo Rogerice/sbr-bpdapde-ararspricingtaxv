@@ -33,7 +33,7 @@ public class OffersProcessingService {
       OffersPricingRequest request) {
     return CompletableFuture.supplyAsync(
             () -> {
-              log.info("🔍Validando whitelist...");
+              log.info("Validando whitelist...");
 
               boolean isDocumentInWhitelist =
                   whitelistService.isInWhitelist(

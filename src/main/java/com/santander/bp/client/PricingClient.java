@@ -12,14 +12,8 @@ import org.springframework.web.client.RestTemplate;
 @Service
 public class PricingClient {
 
+  private static final String PRICING_URL = "http://localhost:9999/prices";
   private final RestTemplate restTemplate;
-
-  // 2. Remova a URL "hardcoded"
-  private static final String pricingUrl = "http://localhost:9999/prices";
-
-  // 3. Crie um campo para injetar a URL do arquivo de configuração
-  // @Value("${pricing.service.url}")
-  // private String pricingUrl;
 
   public PricingClient(RestTemplate restTemplate) {
     this.restTemplate = restTemplate;
@@ -27,15 +21,13 @@ public class PricingClient {
 
   public List<InvestmentPricingConditionResponse> getPrices(PricingRequest request) {
     try {
-      log.info(
-          "Chamando serviço de Pricing no endpoint: {}", pricingUrl); // Log para confirmar a URL
+      log.info("Chamando serviço de Pricing no endpoint: {}", PRICING_URL);
       PricingResponse response =
-          restTemplate.postForObject(
-              pricingUrl, request, PricingResponse.class); // 4. Use a nova variável
+          restTemplate.postForObject(PRICING_URL, request, PricingResponse.class);
       return response != null ? response.getInvestmentPricingConditions() : List.of();
     } catch (Exception e) {
       log.warn("Erro ao chamar o serviço de Pricing: {}", e.getMessage());
-      return List.of(); // fallback
+      return List.of();
     }
   }
 }
