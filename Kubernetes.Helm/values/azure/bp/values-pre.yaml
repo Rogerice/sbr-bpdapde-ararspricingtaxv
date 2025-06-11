@@ -98,13 +98,3 @@ probe:
   initialDelaySecondsReadness: 60
 
 containerPort: 8080
-
-volumes:
-  - name: altair
-    configMap:
-      defaultMode: 420
-      name: altair-azure
-
-volumeMounts:
-  - name: altair
-    mountPath: /app/configs
