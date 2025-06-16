@@ -18,7 +18,7 @@ public class SubProductCosmosDTOTest {
             .vlMiniSald(300)
             .inRemuPgre("Remu1")
             .dsIndx("Index1")
-            .pzRemuPgre("Pz1")
+            // .pzRemuPgre("Pz1")
             .inCare("Care1")
             .build();
 
@@ -44,7 +44,7 @@ public class SubProductCosmosDTOTest {
     subProduct.setVlMiniSald(300);
     subProduct.setInRemuPgre("Remu1");
     subProduct.setDsIndx("Index1");
-    subProduct.setPzRemuPgre("Pz1");
+    //  subProduct.setPzRemuPgre("Pz1");
     subProduct.setInCare("Care1");
 
     assertNotNull(subProduct);

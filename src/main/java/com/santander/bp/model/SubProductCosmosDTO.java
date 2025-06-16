@@ -2,6 +2,7 @@ package com.santander.bp.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -35,7 +36,7 @@ public class SubProductCosmosDTO {
   private String dsIndx;
 
   @JsonProperty("PZ_REMU_PGRE")
-  private String pzRemuPgre;
+  private List<PrazoRemuneracaoProgressivaDTO> pzRemuPgre;
 
   @JsonProperty("IN_CARE")
   private String inCare;

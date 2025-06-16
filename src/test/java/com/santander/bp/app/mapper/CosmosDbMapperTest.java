@@ -38,7 +38,7 @@ class CosmosDbMapperTest {
                         .vlMiniSald(300)
                         .inRemuPgre("Y")
                         .dsIndx("INDEX1")
-                        .pzRemuPgre("30D")
+                        // .pzRemuPgre("30D")
                         .inCare("N")
                         .build()))
             .build();
