@@ -70,3 +70,4 @@ environment:
 acronymTargetCluster: BP
 infraVersionFile: version.yml
 matriculaPO: T605962
+zeroTouchEnable: true
