@@ -1,9 +1,21 @@
 package com.santander.bp.model.external;
 
-import lombok.Data;
-
-// Audit.java
-@Data
 public class Audit {
-  private String creationApp;
+  private String user;
+
+  public Audit() {}
+
+  public Audit(Audit other) {
+    if (other != null) {
+      this.user = other.user;
+    }
+  }
+
+  public String getUser() {
+    return user;
+  }
+
+  public void setUser(String user) {
+    this.user = user;
+  }
 }

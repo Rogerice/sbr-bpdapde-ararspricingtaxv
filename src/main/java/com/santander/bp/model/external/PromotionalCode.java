@@ -1,9 +1,8 @@
 package com.santander.bp.model.external;
 
-import lombok.Data;
+import lombok.Value;
 
-// PromotionalCode.java
-@Data
+@Value
 public class PromotionalCode {
   private String promotionalCodeId;
 }

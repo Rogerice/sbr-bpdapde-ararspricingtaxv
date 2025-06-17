@@ -1,9 +1,8 @@
 package com.santander.bp.model.external;
 
-import lombok.Data;
+import lombok.Value;
 
-// Contract.java
-@Data
+@Value
 public class Contract {
   private Participant participant;
 }

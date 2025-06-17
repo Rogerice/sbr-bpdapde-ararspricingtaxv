@@ -1,9 +1,9 @@
 package com.santander.bp.model.external;
 
 import java.util.List;
-import lombok.Data;
+import lombok.Value;
 
-@Data
+@Value
 public class PricingResponse {
   private String investmentPriceProposalId;
   private List<InvestmentPricingConditionResponse> investmentPricingConditions;

@@ -1,10 +1,9 @@
 package com.santander.bp.model.external;
 
 import feign.Contract;
-import lombok.Data;
+import lombok.Value;
 
-// InvestmentContract.java
-@Data
+@Value
 public class InvestmentContract {
   private Contract contract;
   private Product product;

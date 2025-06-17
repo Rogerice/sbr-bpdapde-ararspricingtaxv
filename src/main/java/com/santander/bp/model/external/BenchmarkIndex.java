@@ -1,9 +1,8 @@
 package com.santander.bp.model.external;
 
-import lombok.Data;
+import lombok.Value;
 
-// BenchmarkIndex.java
-@Data
+@Value
 public class BenchmarkIndex {
   private String code;
 }

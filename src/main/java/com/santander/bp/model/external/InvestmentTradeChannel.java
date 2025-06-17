@@ -1,9 +1,8 @@
 package com.santander.bp.model.external;
 
-import lombok.Data;
+import lombok.Value; // Mude para @Value
 
-// InvestmentTradeChannel.java
-@Data
+@Value
 public class InvestmentTradeChannel {
-  private String code;
+  String code; //
 }

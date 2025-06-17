@@ -1,8 +1,8 @@
 package com.santander.bp.model.external;
 
-import lombok.Data;
+import lombok.Value;
 
-@Data
+@Value
 public class InvestmentPricingCondition {
   private Product product;
   private BenchmarkIndex benchmarkIndex;

@@ -17,33 +17,31 @@ public class PricingRequestMapper {
 
   public PricingRequest buildFromCosmosOffers(List<OffersPricingResponse> cosmosOffers) {
     if (cosmosOffers == null || cosmosOffers.isEmpty()) {
-      return new PricingRequest();
+      return new PricingRequest(null, List.of());
     }
 
     OffersPricingResponse offer = cosmosOffers.get(0);
 
-    InvestmentOrder investmentOrder = new InvestmentOrder();
-    investmentOrder.setTypeCode("STANDARD");
+    PromotionalCode promotionalCodeForOrder = new PromotionalCode(null);
+    PromotionalCode promotionalCodeForCondition = new PromotionalCode(null);
 
-    PromotionalCode promo = new PromotionalCode();
-    investmentOrder.setPromotionalCode(promo);
+    BenchmarkIndex benchmark = new BenchmarkIndex(null);
 
-    InvestmentPricingCondition condition = new InvestmentPricingCondition();
+    Product product = new Product(offer.getSubProduct(), null, null);
 
-    Product product = new Product();
-    product.setName(offer.getSubProduct());
-    condition.setProduct(product);
+    InvestmentPricingCondition condition =
+        new InvestmentPricingCondition(product, benchmark, promotionalCodeForCondition);
 
-    BenchmarkIndex benchmark = new BenchmarkIndex();
-    condition.setBenchmarkIndex(benchmark);
+    InvestmentOrder investmentOrder =
+        new InvestmentOrder(
+            null, // investmentTradeChannel
+            null, // netAmount
+            null, // investmentContract
+            "STANDARD", // typeCode
+            promotionalCodeForOrder, // promotionalCode
+            null // audit
+            );
 
-    PromotionalCode promoCond = new PromotionalCode();
-    condition.setPromotionalCode(promoCond);
-
-    PricingRequest request = new PricingRequest();
-    request.setInvestmentOrder(investmentOrder);
-    request.setInvestmentPricingConditions(List.of(condition));
-
-    return request;
+    return new PricingRequest(investmentOrder, List.of(condition));
   }
 }

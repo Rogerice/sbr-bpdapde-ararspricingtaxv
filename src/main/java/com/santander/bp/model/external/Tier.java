@@ -1,8 +1,8 @@
 package com.santander.bp.model.external;
 
-import lombok.Data;
+import lombok.Value;
 
-@Data
+@Value
 public class Tier {
   private Term term;
   private String aprPeriodInterest;
