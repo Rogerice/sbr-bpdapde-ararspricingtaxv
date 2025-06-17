@@ -2,8 +2,9 @@ package com.santander.bp.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -11,9 +12,9 @@ import lombok.NoArgsConstructor;
 @Data
 @Builder
 @NoArgsConstructor
-@AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class SubProductCosmosDTO {
+
   @JsonProperty("NM_SUBP")
   private String nmSubp;
 
@@ -40,4 +41,50 @@ public class SubProductCosmosDTO {
 
   @JsonProperty("IN_CARE")
   private String inCare;
+
+  /** Construtor manual que recebe todos os campos e cria uma cópia defensiva da lista. */
+  public SubProductCosmosDTO(
+      String nmSubp,
+      String cdSubp,
+      Integer vlMiniApli,
+      Integer vlMiniResg,
+      Integer vlMiniSald,
+      String inRemuPgre,
+      String dsIndx,
+      List<PrazoRemuneracaoProgressivaDTO> pzRemuPgre,
+      String inCare) {
+    this.nmSubp = nmSubp;
+    this.cdSubp = cdSubp;
+    this.vlMiniApli = vlMiniApli;
+    this.vlMiniResg = vlMiniResg;
+    this.vlMiniSald = vlMiniSald;
+    this.inRemuPgre = inRemuPgre;
+    this.dsIndx = dsIndx;
+    // Chama o nosso setter seguro para criar a cópia
+    this.setPzRemuPgre(pzRemuPgre);
+    this.inCare = inCare;
+  }
+
+  /**
+   * Setter manual para o campo da lista. Ele cria uma cópia defensiva para proteger a lista
+   * interna.
+   */
+  public void setPzRemuPgre(List<PrazoRemuneracaoProgressivaDTO> pzRemuPgre) {
+    if (pzRemuPgre == null) {
+      this.pzRemuPgre = null;
+    } else {
+      this.pzRemuPgre = new ArrayList<>(pzRemuPgre);
+    }
+  }
+
+  /**
+   * Getter manual para o campo da lista. Retorna uma CÓPIA não modificável da lista para proteger o
+   * estado interno.
+   */
+  public List<PrazoRemuneracaoProgressivaDTO> getPzRemuPgre() {
+    if (this.pzRemuPgre == null) {
+      return null;
+    }
+    return Collections.unmodifiableList(this.pzRemuPgre);
+  }
 }
