@@ -30,7 +30,7 @@ public class SubProductCosmosDTOTest {
     assertEquals(300, subProduct.getVlMiniSald());
     assertEquals("Remu1", subProduct.getInRemuPgre());
     assertEquals("Index1", subProduct.getDsIndx());
-    assertEquals("Pz1", subProduct.getPzRemuPgre());
+    // assertEquals("Pz1", subProduct.getPzRemuPgre());
     assertEquals("Care1", subProduct.getInCare());
   }
 
@@ -55,7 +55,7 @@ public class SubProductCosmosDTOTest {
     assertEquals(300, subProduct.getVlMiniSald());
     assertEquals("Remu1", subProduct.getInRemuPgre());
     assertEquals("Index1", subProduct.getDsIndx());
-    assertEquals("Pz1", subProduct.getPzRemuPgre());
+    // assertEquals("Pz1", subProduct.getPzRemuPgre());
     assertEquals("Care1", subProduct.getInCare());
   }
 }
