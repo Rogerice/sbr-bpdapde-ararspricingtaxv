@@ -1,5 +1,8 @@
 package com.santander.bp.model.external;
 
+import lombok.Generated;
+
+@Generated
 public class Audit {
   private String user;
 

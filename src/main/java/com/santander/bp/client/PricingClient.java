@@ -4,12 +4,14 @@ import com.santander.bp.model.external.InvestmentPricingConditionResponse;
 import com.santander.bp.model.external.PricingRequest;
 import com.santander.bp.model.external.PricingResponse;
 import java.util.List;
+import lombok.Generated;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 @Slf4j
 @Service
+@Generated
 public class PricingClient {
 
   private static final String PRICING_URL = "http://localhost:9999/prices";
