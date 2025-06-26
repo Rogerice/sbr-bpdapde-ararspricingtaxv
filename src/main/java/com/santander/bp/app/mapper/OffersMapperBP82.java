@@ -115,12 +115,16 @@ public class OffersMapperBP82 {
     response.setTerm(determineMainTerm(bpmp820));
     OffersPricingResponseLegacyFlags legacyFlags = new OffersPricingResponseLegacyFlags();
 
-    legacyFlags.setOtrPraz(bpmp820.getOTRPRAZ());
-    legacyFlags.setInApli(bpmp820.getINAPLI());
-    legacyFlags.setInResg(bpmp820.getINRESG());
-    legacyFlags.setAgnFutu(bpmp820.getAGNFUTU());
-    legacyFlags.setAgnResg(bpmp820.getAGNRESG());
-    legacyFlags.setHronlin(bpmp820.getHRONLIN());
+    legacyFlags.setOtrPraz(bpmp820.getOTRPRAZ()); // indicador de que não é permitido Canal
+    legacyFlags.setInApli(
+        bpmp820.getINAPLI()); // indicador de permissão se o canal é permitido fazer programação
+    legacyFlags.setInResg(bpmp820.getINRESG()); // caracteristica de resgate do canal
+    legacyFlags.setAgnFutu(
+        bpmp820.getAGNFUTU()); // indicador de caracteristica de agendamento aplicação
+    legacyFlags.setAgnResg(
+        bpmp820.getAGNRESG()); // indicador de caracteristica de agendamento Resgate
+    legacyFlags.setHronlin(bpmp820.getHRONLIN()); // indicador é hardcode, 20h
+
     response.setLegacyFlags(legacyFlags);
     return response;
   }
