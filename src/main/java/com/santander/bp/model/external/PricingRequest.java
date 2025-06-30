@@ -2,9 +2,13 @@ package com.santander.bp.model.external;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
-import lombok.Value;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Value
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class PricingRequest {
   @JsonProperty("investmentOrder")
   private InvestmentOrder investmentOrder;

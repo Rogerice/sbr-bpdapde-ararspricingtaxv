@@ -1,10 +1,12 @@
 package com.santander.bp.model.external;
 
-import lombok.Generated;
-import lombok.Value;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Value
-@Generated
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class InvestmentPricingConditionResponse {
   private Price price;
   private Product product;

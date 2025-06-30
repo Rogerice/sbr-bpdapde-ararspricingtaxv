@@ -1,3 +1,9 @@
+# Adicione esta seção ao seu arquivo application.yml
+# para externalizar a URL do serviço de pricing.
+services:
+  pricing:
+    url: https://prc-varejo.paas.santanderbr.pre.corp/prc-pricing-investments-adapter/v1/fixed_income_investment_operations/prices
+
 spring:
   aop:
     proxy-target-class: false

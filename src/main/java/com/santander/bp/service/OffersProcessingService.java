@@ -1,6 +1,5 @@
 package com.santander.bp.service;
 
-import com.santander.bp.app.mapper.OffersMapperBP82; // Adicionamos a injeção do Mapper
 import com.santander.bp.exception.RestApiException;
 import com.santander.bp.model.OffersPricingRequest;
 import com.santander.bp.model.OffersPricingResponse;
@@ -24,8 +23,7 @@ public class OffersProcessingService {
   public OffersProcessingService(
       OffersPricingServiceBP82 offersPricingServiceBP82,
       OffersService offersService,
-      WhitelistService whitelistService,
-      OffersMapperBP82 offersMapperBP82) {
+      WhitelistService whitelistService) {
     this.offersPricingServiceBP82 = offersPricingServiceBP82;
     this.offersService = offersService;
     this.whitelistService = whitelistService;
@@ -35,7 +33,7 @@ public class OffersProcessingService {
       OffersPricingRequest request) {
     return CompletableFuture.supplyAsync(
             () -> {
-              log.info("Validando whitelist...");
+              log.info("Validando whitelist para documento: {}", request.getDocumentNumber());
 
               boolean isDocumentInWhitelist =
                   whitelistService.isInWhitelist(
@@ -51,29 +49,38 @@ public class OffersProcessingService {
                   isAgencyInWhitelist);
 
               if (isDocumentInWhitelist || isAgencyInWhitelist) {
+                // Fluxo Whitelist
                 return processWhitelistOffers(request);
               } else {
+                // Deixa o próximo estágio da pipeline decidir
                 return null;
               }
             })
         .thenCompose(
             result -> {
               if (result != null) {
+                // Se o resultado não for nulo, significa que o fluxo Whitelist foi executado
                 return CompletableFuture.completedFuture(result);
               } else {
+                // Resultado é nulo, então executa o fluxo não-whitelist (legado)
                 return processNonWhitelistOffers(request);
               }
             });
   }
 
+  /**
+   * Processa o fluxo para clientes na whitelist. Busca ofertas no CosmosDB e as enriquece com o
+   * serviço de Pricing.
+   */
   private List<OffersPricingResponse> processWhitelistOffers(OffersPricingRequest request) {
-    log.info("Cliente está na whitelist. Buscando ofertas no CosmosDB...");
+    log.info("Cliente na whitelist. Buscando ofertas no CosmosDB...");
 
+    // Passo 1: Buscar ofertas base
     List<OffersPricingResponse> cosmosOffers =
         offersService.getOffers(request.getSegment(), request.getChannel(), "26");
 
     if (cosmosOffers.isEmpty()) {
-      log.warn(" Nenhuma oferta encontrada no CosmosDB.");
+      log.warn("Nenhuma oferta encontrada no CosmosDB para os critérios fornecidos.");
       throw new RestApiException(
           HttpStatus.NOT_FOUND,
           "NOT_FOUND",
@@ -82,27 +89,27 @@ public class OffersProcessingService {
           null);
     }
 
-    log.info("Enriquecendo ofertas com Pricing...");
-    return offersService.enrichOffersWithPricing(cosmosOffers);
+    log.info("{} ofertas encontradas no Cosmos. Enriquecendo com Pricing...", cosmosOffers.size());
+    // Passo 2: Enriquecer ofertas com o serviço de pricing.
+    // **Ajuste aqui para passar o 'apiRequest' original**
+    return offersService.enrichOffersWithPricing(request, cosmosOffers);
   }
 
+  /**
+   * Processa o fluxo para clientes que não estão na whitelist. Chama o serviço legado via Altair
+   * MQ.
+   */
   private CompletableFuture<List<OffersPricingResponse>> processNonWhitelistOffers(
       OffersPricingRequest request) {
-
-    log.info("Cliente NÃO está na whitelist. Buscando ofertas via BP82...");
+    log.info("Cliente NÃO está na whitelist. Buscando ofertas via BP82 (Altair)...");
 
     return CompletableFuture.supplyAsync(
         () -> {
-          log.info("Chamando `processOffers` do `OffersPricingServiceBP82`...");
           List<OffersPricingResponse> responseList =
               offersPricingServiceBP82.processOffers(request);
 
-          log.info(
-              "Processo concluído via `OffersPricingServiceBP82`. Tamanho da lista: {}",
-              responseList.size());
-
           if (responseList.isEmpty()) {
-            log.warn("Nenhuma oferta encontrada para os parâmetros fornecidos.");
+            log.warn("Nenhuma oferta encontrada (via BP82) para os parâmetros fornecidos.");
             throw new RestApiException(
                 HttpStatus.NOT_FOUND,
                 "NOT_FOUND",
@@ -110,7 +117,7 @@ public class OffersProcessingService {
                 "Nenhuma oferta foi encontrada para os critérios especificados.",
                 null);
           }
-
+          log.info("Processo via BP82 concluído. {} ofertas encontradas.", responseList.size());
           return responseList;
         });
   }

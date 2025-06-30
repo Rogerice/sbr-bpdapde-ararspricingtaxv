@@ -6,8 +6,6 @@ spring:
 # server port
 server:
   port: 8080
-  #servlet:
-    #context-path: /ars-pricing-tax-v1 
     
 # Arsenal core library settings
 arsenal:
@@ -15,45 +13,35 @@ arsenal:
     core:
       api:
         enable-docs: true # Enable Swagger/OpenAPI documentation
-        docs-base-package: com.santander.bp.controller # Package where the controller classes are found
+        docs-base-package: com.santander.bp.controller
         archetypekey: ####415253454E414C####
   logging:
     console-log: true
     dev-mode: true
-#    kafka:
-#        servers: localhost:9092
-#        topic: logs
-#        keystore:
-#            location: /tmp/keystore
-#            password: xpto
-#        truststore:
-#            location: /tmp/truststore
-#            password: xpto
-    isGluon: false # If the isGluon field is true, you must set the following parameters:
-#    company: # Santander company whose component is generating the logs.
-#    componentName: # Name of the component that generates the log.
-#    componentId: # Identifier of the component that generates the log.
-#    componentType: # The type of the Gluon component (e.g., microservice, API...)
-#    appName: # The technical application name
-#    appId: # Identifier of the application of the component that generates the log.
-
+    isGluon: false
 
 # Logging
-# Overriding log groups and levels
+# Níveis de Log para Depuração
 logging:
-  group:
-    web: org.springframework.core.codec, org.springframework.http, org.springframework.web
-    spring: org.springframework.core.env
-    servlet: org.springframework.boot.web, org.apache.catalina, org.apache.coyote, org.apache.tomcat
-    data: org.springframework.jdbc.core, org.hibernate.sql, org.springframework.orm.jpa, com.zaxxer.hikari, org.hibernate, org.jooq.tools.LoggerListener
-    app: com.santander.bp
   level:
-    root: WARN
-    spring: INFO
-    app: DEBUG
-    servlet: WARN
-    web: WARN
-    data: INFO
+    # Nível geral da sua aplicação
+    com.santander.bp: DEBUG
+    
+    # Logs do RestTemplate do Spring
+    org.springframework.web.client.RestTemplate: DEBUG
+    
+    # === ADIÇÃO PARA VER O JSON ===
+    # 'headers' mostra os cabeçalhos exatos da requisição e resposta.
+    org.apache.http.headers: DEBUG
+    # 'wire' é o mais poderoso. Ele mostra o tráfego de rede bruto,
+    # incluindo o corpo (body) exato do JSON que recebemos na resposta.
+    org.apache.http.wire: TRACE
+
+    # Níveis padrão para os outros pacotes
+    root: INFO
+    org.springframework: INFO
+    org.hibernate: WARN
+    data: WARN
 
 # Resilience4j settings
 resilience4j:

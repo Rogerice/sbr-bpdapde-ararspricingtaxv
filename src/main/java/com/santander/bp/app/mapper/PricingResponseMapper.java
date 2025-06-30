@@ -4,6 +4,7 @@ import com.santander.bp.model.OffersPricingResponse;
 import com.santander.bp.model.RateTerm;
 import com.santander.bp.model.external.InvestmentPricingConditionResponse;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -16,49 +17,63 @@ import org.springframework.stereotype.Component;
 @Generated
 public class PricingResponseMapper {
 
-  public List<OffersPricingResponse> mergePricingWithCosmos(
-      List<OffersPricingResponse> cosmosOffers,
-      List<InvestmentPricingConditionResponse> pricingData) {
-
-    if (pricingData == null || pricingData.isEmpty()) {
-      log.warn("Lista de condições de pricing está vazia. Retornando apenas os dados do Cosmos.");
-      return cosmosOffers;
-    }
-
-    List<OffersPricingResponse> enriched = new ArrayList<>(cosmosOffers.size());
-
-    for (OffersPricingResponse offer : cosmosOffers) {
-      pricingData.stream()
-          .filter(p -> isSubproductMatching(p, offer.getSubProductCode()))
-          .findFirst()
-          .ifPresentOrElse(
-              matchedPricing -> enrichOffer(offer, matchedPricing),
-              () ->
-                  log.info(
-                      "Oferta sem match no pricing. ID Subproduto: {}", offer.getSubProductCode()));
-
-      enriched.add(offer);
-    }
-
-    return enriched;
-  }
-
+  /**
+   * Mescla os dados das ofertas do CosmosDB com os dados de precificação. ESTA É A VERSÃO FINAL que
+   * implementa a lógica de enriquecimento.
+   *
+   * @param cosmosOffers A lista de ofertas base vinda do Cosmos.
+   * @param pricingData A resposta do serviço de pricing.
+   * @return A lista de ofertas do Cosmos, enriquecida com as taxas ou com a mensagem de negócio do
+   *     pricing.
+   */
   public List<OffersPricingResponse> mergeCosmosWithPricing(
       List<OffersPricingResponse> cosmosOffers,
       List<InvestmentPricingConditionResponse> pricingData) {
 
-    for (OffersPricingResponse offer : cosmosOffers) {
-      for (InvestmentPricingConditionResponse price : pricingData) {
-        if (isFullMatch(offer, price)) {
-          enrichOffer(offer, price);
-          break;
+    // Cenário 1: O serviço de pricing retornou uma única resposta com uma mensagem de "reason".
+    // Isso indica um "erro" de negócio, como "subproduto não encontrado".
+    if (isBusinessReasonResponse(pricingData)) {
+      String reasonMessage = pricingData.get(0).getReason();
+      log.warn(
+          "Recebida mensagem de negócio do Pricing: '{}'. Adicionando a todas as ofertas.",
+          reasonMessage);
+
+      // Adiciona a mensagem de erro a todas as ofertas que seriam retornadas.
+      for (OffersPricingResponse offer : cosmosOffers) {
+        if (offer.getMessages() == null) {
+          offer.setMessages(new ArrayList<>());
         }
+        offer.getMessages().add(reasonMessage);
       }
+      return cosmosOffers;
+    }
+
+    // Cenário 2: Resposta de sucesso. Mescla os dados de taxa para cada oferta correspondente.
+    for (OffersPricingResponse offer : cosmosOffers) {
+      pricingData.stream()
+          // Encontra a condição de pricing correspondente pelo código do subproduto.
+          .filter(price -> isSubproductMatching(price, offer.getSubProductCode()))
+          .findFirst()
+          .ifPresent(matchedPricing -> enrichOffer(offer, matchedPricing));
     }
 
     return cosmosOffers;
   }
 
+  /**
+   * Verifica se a resposta do pricing é uma simples mensagem de negócio. A condição é: a lista tem
+   * exatamente um item, e esse item tem o campo 'reason' preenchido, mas os campos 'product' e
+   * 'price' estão nulos.
+   */
+  private boolean isBusinessReasonResponse(List<InvestmentPricingConditionResponse> pricingData) {
+    return pricingData != null
+        && pricingData.size() == 1
+        && pricingData.get(0).getReason() != null
+        && pricingData.get(0).getProduct() == null
+        && pricingData.get(0).getPrice() == null;
+  }
+
+  /** Verifica se o código do subproduto em uma condição de pricing corresponde ao de uma oferta. */
   private boolean isSubproductMatching(
       InvestmentPricingConditionResponse p, String subProductCode) {
     return p.getProduct() != null
@@ -66,14 +81,7 @@ public class PricingResponseMapper {
         && Objects.equals(p.getProduct().getSubproduct().getCode(), subProductCode);
   }
 
-  private boolean isFullMatch(
-      OffersPricingResponse offer, InvestmentPricingConditionResponse price) {
-    return price.getProduct() != null
-        && price.getProduct().getSubproduct() != null
-        && offer.getProduct().equals(price.getProduct().getBusinessCategoryCode())
-        && offer.getSubProductCode().equals(price.getProduct().getSubproduct().getCode());
-  }
-
+  /** Enriquece uma única oferta com os dados de uma condição de pricing. */
   private void enrichOffer(OffersPricingResponse offer, InvestmentPricingConditionResponse price) {
     offer.setRateTerm(buildRateTerms(price));
     offer.setBenchmarkIndex(
@@ -82,12 +90,13 @@ public class PricingResponseMapper {
         price.getPromotionalCode() != null
             ? price.getPromotionalCode().getPromotionalCodeId()
             : null);
-    offer.setProgressiveRemunerationIndicator(Boolean.FALSE);
+    // Adicione aqui outros campos que venham na resposta de sucesso do pricing.
   }
 
+  /** Constrói a lista de termos e taxas a partir de uma resposta de pricing. */
   private List<RateTerm> buildRateTerms(InvestmentPricingConditionResponse price) {
     if (price.getPrice() == null || price.getPrice().getTiers() == null) {
-      return new ArrayList<>();
+      return Collections.emptyList();
     }
 
     return price.getPrice().getTiers().stream()

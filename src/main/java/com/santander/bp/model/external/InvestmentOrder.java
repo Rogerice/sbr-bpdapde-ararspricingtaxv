@@ -1,11 +1,13 @@
 package com.santander.bp.model.external;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.Value;
+import lombok.NoArgsConstructor;
 
-@Value
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class InvestmentOrder {
 
   @JsonProperty("investmentTradeChannel")
